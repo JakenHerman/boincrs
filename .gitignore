@@ -1,9 +1,6 @@
 # Rust build output
 /target/
 
-# Cargo artifacts
-Cargo.lock
-
 # Environment and secrets
 .env
 .env.*
