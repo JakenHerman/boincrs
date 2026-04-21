@@ -7,7 +7,8 @@ use boincrs::error::AppResult;
 #[tokio::main]
 async fn main() -> AppResult<()> {
     load_dotenv();
-    let endpoint = std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
+    let endpoint =
+        std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
     let password = load_password_from_env();
 
     let transport = TcpBoincTransport::connect(endpoint).await?;

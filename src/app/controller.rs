@@ -1,7 +1,9 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crossterm::event::{self, Event};
-use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
+use crossterm::terminal::{
+    disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
+};
 use crossterm::ExecutableCommand;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
@@ -79,7 +81,10 @@ impl AppController {
     }
 
     async fn handle_action(&mut self, action: UserAction) {
-        if matches!(action, UserAction::ConfirmPending | UserAction::CancelPending) {
+        if matches!(
+            action,
+            UserAction::ConfirmPending | UserAction::CancelPending
+        ) {
             self.handle_confirmation(action).await;
             return;
         }

@@ -2,11 +2,7 @@ use boincrs::app::actions::{FocusPane, UserAction};
 
 #[test]
 fn focus_pane_cycles_all_columns() {
-    let pane = FocusPane::Projects
-        .next()
-        .next()
-        .next()
-        .next();
+    let pane = FocusPane::Projects.next().next().next();
     assert_eq!(pane, FocusPane::Projects);
 }
 

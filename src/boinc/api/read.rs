@@ -36,7 +36,10 @@ impl<'a> BoincReadApi<'a> {
     /// 2. running (by completion descending)
     /// 3. waiting/ready
     pub async fn tasks(&mut self) -> AppResult<Vec<Task>> {
-        let reply = self.rpc.call("get_results", "<active_only>0</active_only>").await?;
+        let reply = self
+            .rpc
+            .call("get_results", "<active_only>0</active_only>")
+            .await?;
         let parsed = protocol::parse_tasks(&reply)?;
         let mut tasks: Vec<Task> = parsed
             .into_iter()
