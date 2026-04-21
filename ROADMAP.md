@@ -14,8 +14,8 @@
 ## Next
 
 - Better task metadata coverage (more BOINC result fields)
-- Better transfer visibility (retry/error reasons and throughput)
-- Improved project/task selection for all panes
+- ~~Better transfer visibility (retry/error reasons and throughput)~~ ✓
+- ~~Improved project/task selection for all panes~~ ✓
 - Exportable diagnostics bundle for bug reports
 - Optional `.env` auto-loading without shell `source`
 

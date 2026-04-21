@@ -90,6 +90,11 @@ pub struct ParsedTransfer {
     pub project_url: String,
     pub file_name: String,
     pub status: String,
+    pub nbytes: Option<u64>,
+    pub bytes_xferred: Option<u64>,
+    pub xfer_speed: Option<f64>,
+    pub is_upload: bool,
+    pub error_msg: Option<String>,
 }
 
 /// Parsed BOINC client mode values.
@@ -182,6 +187,16 @@ pub fn parse_transfers(xml: &str) -> AppResult<Vec<ParsedTransfer>> {
     let mut out = Vec::new();
     for block in extract_block_items(xml, "file_transfer") {
         let status = extract_tag_value(&block, "status").unwrap_or_else(|| "unknown".to_string());
+        let is_upload = parse_bool_tag(&block, "generated_locally")
+            || extract_tag_value(&block, "is_upload")
+                .map(|v| v.trim() == "1")
+                .unwrap_or(false);
+        let bytes_xferred = extract_tag_value(&block, "bytes_xferred")
+            .or_else(|| extract_tag_value(&block, "last_bytes_xferred"))
+            .and_then(|v| v.trim().parse::<u64>().ok());
+        let error_msg = extract_tag_value(&block, "error_msg")
+            .or_else(|| extract_tag_value(&block, "error"))
+            .filter(|s| !s.trim().is_empty());
         out.push(ParsedTransfer {
             project_url: extract_tag_value(&block, "project_url").unwrap_or_default(),
             file_name: extract_tag_value(&block, "name").unwrap_or_default(),
@@ -190,6 +205,13 @@ pub fn parse_transfers(xml: &str) -> AppResult<Vec<ParsedTransfer>> {
             } else {
                 status
             },
+            nbytes: extract_tag_value(&block, "nbytes")
+                .and_then(|v| v.trim().parse::<f64>().ok())
+                .map(|v| v as u64),
+            bytes_xferred,
+            xfer_speed: parse_f64_tag(&block, "xfer_speed"),
+            is_upload,
+            error_msg,
         });
     }
     Ok(out)

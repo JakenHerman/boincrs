@@ -5,6 +5,20 @@ All notable changes to `boincrs` are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Transfer visibility: each transfer now shows direction (↑/↓), progress percentage,
+  human-readable byte counts, current transfer speed, and error message when present.
+- Selection cursor in Projects and Transfers panes — `j/k` and arrow keys now navigate
+  all three panes, and project/transfer actions apply to the highlighted item.
+
+### Changed
+- Project and transfer panes now use stateful list rendering with a `▶` highlight symbol,
+  consistent with the Tasks pane.
+
+---
+
 ## [0.1.0-beta] - 2026-04-20
 
 ### Added

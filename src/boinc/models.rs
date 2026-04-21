@@ -59,6 +59,16 @@ pub struct Transfer {
     pub file_name: String,
     /// Transfer status string from BOINC.
     pub status: String,
+    /// Total file size in bytes, if known.
+    pub nbytes: Option<u64>,
+    /// Bytes transferred so far.
+    pub bytes_xferred: Option<u64>,
+    /// Current transfer speed in bytes/sec.
+    pub xfer_speed: Option<f64>,
+    /// True when this is an upload (generated locally).
+    pub is_upload: bool,
+    /// Error message if transfer is in a retry/error state.
+    pub error_msg: Option<String>,
 }
 
 /// BOINC run mode setting values.

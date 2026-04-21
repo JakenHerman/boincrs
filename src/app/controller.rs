@@ -214,13 +214,28 @@ impl AppController {
     }
 
     fn navigate_selection(&mut self, up: bool) {
-        if self.state.focus != FocusPane::Tasks {
-            return;
-        }
-        if up {
-            self.state.move_task_selection_up();
-        } else {
-            self.state.move_task_selection_down();
+        match self.state.focus {
+            FocusPane::Projects => {
+                if up {
+                    self.state.move_project_selection_up();
+                } else {
+                    self.state.move_project_selection_down();
+                }
+            }
+            FocusPane::Tasks => {
+                if up {
+                    self.state.move_task_selection_up();
+                } else {
+                    self.state.move_task_selection_down();
+                }
+            }
+            FocusPane::Transfers => {
+                if up {
+                    self.state.move_transfer_selection_up();
+                } else {
+                    self.state.move_transfer_selection_down();
+                }
+            }
         }
     }
 }

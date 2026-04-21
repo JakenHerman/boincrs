@@ -67,6 +67,11 @@ impl<'a> BoincReadApi<'a> {
                 project_url: item.project_url,
                 file_name: item.file_name,
                 status: item.status,
+                nbytes: item.nbytes,
+                bytes_xferred: item.bytes_xferred,
+                xfer_speed: item.xfer_speed,
+                is_upload: item.is_upload,
+                error_msg: item.error_msg,
             })
             .collect())
     }

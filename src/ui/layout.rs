@@ -31,24 +31,36 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
         .split(vertical[1]);
 
     let projects = List::new(widgets::projects::items(&state.projects))
-        .block(block("Projects", state.focus == FocusPane::Projects));
+        .block(block("Projects", state.focus == FocusPane::Projects))
+        .highlight_symbol("▶ ");
     let tasks = List::new(widgets::tasks::items(&state.tasks))
         .block(block("Tasks", state.focus == FocusPane::Tasks))
         .highlight_symbol("▶ ");
     let transfers = List::new(widgets::transfers::items(&state.transfers))
-        .block(block("Transfers", state.focus == FocusPane::Transfers));
+        .block(block("Transfers", state.focus == FocusPane::Transfers))
+        .highlight_symbol("▶ ");
 
     let selected_task = Paragraph::new(selected_task_details(state))
         .block(Block::default().borders(Borders::ALL).title("Selected Task"));
     frame.render_widget(selected_task, vertical[0]);
 
-    frame.render_widget(projects, panes[0]);
+    let mut project_state = ListState::default();
+    if !state.projects.is_empty() {
+        project_state.select(Some(state.selected_project_idx));
+    }
+    frame.render_stateful_widget(projects, panes[0], &mut project_state);
+
     let mut task_state = ListState::default();
     if !state.tasks.is_empty() {
         task_state.select(Some(state.selected_task_idx));
     }
     frame.render_stateful_widget(tasks, panes[1], &mut task_state);
-    frame.render_widget(transfers, panes[2]);
+
+    let mut transfer_state = ListState::default();
+    if !state.transfers.is_empty() {
+        transfer_state.select(Some(state.selected_transfer_idx));
+    }
+    frame.render_stateful_widget(transfers, panes[2], &mut transfer_state);
 
     let footer = Paragraph::new(
         "q quit | r refresh | tab cycle pane | j/k or arrows scroll tasks | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | 1-9 modes",

@@ -41,7 +41,7 @@ Binary: `./target/release/boincrs` (Linux/macOS) or `.\target\release\boincrs.ex
 - **Panes:** Projects | Tasks | Transfers  
 - **Header:** selected task — project, progress, status, elapsed/remaining, deadline, application, name; plus client run/network/gpu summary  
 - **Task groups:** `READY TO REPORT` → `RUNNING` (by % done) → `WAITING / READY`  
-- **Navigation:** `tab` cycles panes; with Tasks focused, `j`/`k` or arrow keys move selection  
+- **Navigation:** `tab` cycles panes; `j`/`k` or arrow keys move selection in any pane  
 
 ## Configuration
 
@@ -78,7 +78,7 @@ cargo run
 | Keys | Action |
 | --- | --- |
 | `tab` | Cycle Projects / Tasks / Transfers |
-| `j` `k` / arrows | Move task selection (Tasks pane) |
+| `j` `k` / arrows | Move selection (any pane) |
 | `r` | Refresh |
 | `q` | Quit |
 | `y` / `n` | Confirm / cancel destructive actions |
