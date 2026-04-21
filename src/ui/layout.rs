@@ -40,8 +40,11 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
         .block(block("Transfers", state.focus == FocusPane::Transfers))
         .highlight_symbol("▶ ");
 
-    let selected_task = Paragraph::new(selected_task_details(state))
-        .block(Block::default().borders(Borders::ALL).title("Selected Task"));
+    let selected_task = Paragraph::new(selected_task_details(state)).block(
+        Block::default()
+            .borders(Borders::ALL)
+            .title("Selected Task"),
+    );
     frame.render_widget(selected_task, vertical[0]);
 
     let mut project_state = ListState::default();
@@ -85,7 +88,10 @@ fn block(title: &str, focused: bool) -> Block<'_> {
     } else {
         Style::default()
     };
-    Block::default().borders(Borders::ALL).title(title).style(style)
+    Block::default()
+        .borders(Borders::ALL)
+        .title(title)
+        .style(style)
 }
 
 fn selected_task_details(state: &AppState) -> String {
@@ -152,7 +158,11 @@ fn format_duration(seconds: Option<f64>) -> String {
     let Some(raw) = seconds else {
         return "n/a".to_string();
     };
-    let total = if raw.is_sign_negative() { 0 } else { raw as u64 };
+    let total = if raw.is_sign_negative() {
+        0
+    } else {
+        raw as u64
+    };
     let h = total / 3600;
     let m = (total % 3600) / 60;
     let s = total % 60;
@@ -183,9 +193,5 @@ fn short_project(url: &str) -> String {
         .trim_start_matches("https://")
         .trim_start_matches("http://")
         .trim_end_matches('/');
-    trimmed
-        .split('/')
-        .next()
-        .unwrap_or(trimmed)
-        .to_string()
+    trimmed.split('/').next().unwrap_or(trimmed).to_string()
 }

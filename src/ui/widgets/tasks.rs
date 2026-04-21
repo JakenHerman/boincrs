@@ -31,7 +31,10 @@ pub fn items(tasks: &[Task]) -> Vec<ListItem<'_>> {
                 Span::styled(icon, Style::default().fg(color)),
                 Span::raw(" "),
                 Span::raw(name),
-                Span::styled(format!(" [{project}]"), Style::default().fg(Color::DarkGray)),
+                Span::styled(
+                    format!(" [{project}]"),
+                    Style::default().fg(Color::DarkGray),
+                ),
             ]);
             ListItem::new(Line::from(spans))
         })
@@ -72,9 +75,5 @@ fn short_project(url: &str) -> String {
         .trim_start_matches("https://")
         .trim_start_matches("http://")
         .trim_end_matches('/');
-    trimmed
-        .split('/')
-        .next()
-        .unwrap_or(trimmed)
-        .to_string()
+    trimmed.split('/').next().unwrap_or(trimmed).to_string()
 }

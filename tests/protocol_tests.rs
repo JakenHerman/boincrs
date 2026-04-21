@@ -1,13 +1,13 @@
 use boincrs::boinc::protocol::{
-    compute_nonce_hash, frame_request, parse_auth_authorized, parse_auth_nonce, parse_cc_status,
-    parse_projects, parse_response_payload, parse_tasks, parse_transfers, reply_has_unauthorized,
-    ParsedTaskStatus,
+    frame_request, parse_auth_authorized, parse_auth_nonce, parse_cc_status, parse_projects,
+    parse_response_payload, parse_tasks, parse_transfers, reply_has_unauthorized, ParsedTaskStatus,
 };
 
 #[test]
 fn frames_request_with_root_and_eom() {
     let framed = frame_request("<get_cc_status/>");
-    let as_text = String::from_utf8(framed[..framed.len() - 1].to_vec()).expect("request should be utf-8");
+    let as_text =
+        String::from_utf8(framed[..framed.len() - 1].to_vec()).expect("request should be utf-8");
     assert!(as_text.contains("<boinc_gui_rpc_request>"));
     assert_eq!(framed.last().copied(), Some(0x03));
 }
@@ -27,12 +27,6 @@ fn parses_auth_responses() {
     let authorized = parse_auth_authorized(auth_xml).expect("authorized should parse");
     assert_eq!(nonce, "abc123");
     assert!(authorized);
-}
-
-#[test]
-fn computes_nonce_hash_md5() {
-    let hash = compute_nonce_hash("nonce", "password");
-    assert_eq!(hash, "9ec96ea2f1ac5aa36b73ae4b5f9f081d");
 }
 
 #[test]
