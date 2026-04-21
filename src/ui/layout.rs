@@ -1,11 +1,11 @@
 use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::style::{Color, Style};
+use ratatui::style::{Color, Modifier, Style};
 use ratatui::widgets::{Block, Borders, List, ListState, Paragraph};
 use ratatui::Frame;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::app::actions::FocusPane;
-use crate::app::state::AppState;
+use crate::app::state::{AppState, ConnectionState};
 use crate::boinc::models::TaskStatus;
 use crate::ui::widgets;
 
@@ -71,13 +71,36 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     .block(Block::default().borders(Borders::ALL).title("Keymap"));
     frame.render_widget(footer, vertical[2]);
 
-    let status_line = if let Some(pending) = &state.pending_confirmation {
-        format!("PENDING CONFIRMATION: {pending} (y/n)")
+    let (status_text, status_style) = if let Some(pending) = &state.pending_confirmation {
+        (
+            format!("PENDING CONFIRMATION: {pending} (y/n)"),
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
+        )
     } else {
-        state.status_line.clone()
+        match &state.conn {
+            ConnectionState::Connected => (state.status_line.clone(), Style::default()),
+            ConnectionState::Retrying {
+                attempt,
+                delay_secs,
+            } => (
+                format!(
+                    "[RETRYING] attempt {attempt} — reconnecting in {delay_secs}s. \
+                     Press 'r' to retry now.",
+                ),
+                Style::default().fg(Color::Yellow),
+            ),
+            ConnectionState::TerminalError(_) => (
+                format!("[ERROR] {} Press 'q' to quit.", state.status_line),
+                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+            ),
+        }
     };
     frame.render_widget(
-        Paragraph::new(status_line).block(Block::default().borders(Borders::ALL).title("Status")),
+        Paragraph::new(status_text)
+            .style(status_style)
+            .block(Block::default().borders(Borders::ALL).title("Status")),
         vertical[3],
     );
 }

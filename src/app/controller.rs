@@ -7,27 +7,38 @@ use crossterm::terminal::{
 use crossterm::ExecutableCommand;
 use ratatui::backend::CrosstermBackend;
 use ratatui::Terminal;
+use tokio::time::Instant;
 
 use crate::app::actions::{FocusPane, UserAction};
-use crate::app::state::AppState;
+use crate::app::reconnect::backoff_delay;
+use crate::app::state::{AppState, ConnectionState};
 use crate::boinc::api::read::BoincReadApi;
 use crate::boinc::api::write::BoincWriteApi;
 use crate::boinc::rpc_client::BoincRpcClient;
+use crate::boinc::transport::TcpBoincTransport;
 use crate::error::AppResult;
 use crate::ui;
 
+const NORMAL_REFRESH_SECS: u64 = 2;
+
 pub struct AppController {
     rpc: BoincRpcClient,
-    state: AppState,
+    pub state: AppState,
     pending_action: Option<UserAction>,
+    endpoint: String,
+    password: Option<String>,
+    retry_attempt: u32,
 }
 
 impl AppController {
-    pub fn new(rpc: BoincRpcClient) -> Self {
+    pub fn new(rpc: BoincRpcClient, endpoint: String, password: Option<String>) -> Self {
         Self {
             rpc,
             state: AppState::default(),
             pending_action: None,
+            endpoint,
+            password,
+            retry_attempt: 0,
         }
     }
 
@@ -39,18 +50,24 @@ impl AppController {
         let mut terminal = Terminal::new(backend)?;
         terminal.clear()?;
 
-        self.refresh().await?;
-        let mut ticker = tokio::time::interval(Duration::from_secs(2));
-        self.state.status_line = "Connected. Refreshing every 2s.".to_string();
+        // First refresh — failures handled gracefully rather than crashing.
+        let first = self.refresh().await;
+        let delay = self.process_refresh_result(first);
+        let mut next_refresh = Instant::now() + delay;
 
         while !self.state.should_quit {
             terminal.draw(|f| ui::layout::draw(f, &self.state))?;
 
+            let is_terminal = matches!(self.state.conn, ConnectionState::TerminalError(_));
+
             tokio::select! {
-                _ = ticker.tick() => {
-                    if let Err(err) = self.refresh().await {
-                        self.state.status_line = format!("refresh failed: {err}");
+                _ = tokio::time::sleep_until(next_refresh), if !is_terminal => {
+                    if matches!(self.state.conn, ConnectionState::Retrying { .. }) {
+                        self.attempt_tcp_reconnect().await;
                     }
+                    let result = self.refresh().await;
+                    let delay = self.process_refresh_result(result);
+                    next_refresh = Instant::now() + delay;
                 }
                 _ = tokio::time::sleep(Duration::from_millis(50)) => {
                     if event::poll(Duration::from_millis(0))? {
@@ -68,6 +85,48 @@ impl AppController {
         let mut stdout = std::io::stdout();
         stdout.execute(LeaveAlternateScreen)?;
         Ok(())
+    }
+
+    /// Processes the outcome of a refresh attempt, updates connection state, and
+    /// returns the delay before the next refresh should be scheduled.
+    pub fn process_refresh_result(&mut self, result: AppResult<()>) -> Duration {
+        match result {
+            Ok(()) => {
+                self.retry_attempt = 0;
+                self.state.conn = ConnectionState::Connected;
+                if !self.state.status_line.starts_with("Connected") {
+                    self.state.status_line = "Connected. Refreshing every 2s.".to_string();
+                }
+                Duration::from_secs(NORMAL_REFRESH_SECS)
+            }
+            Err(ref e) if e.is_transient() => {
+                self.retry_attempt += 1;
+                let delay = backoff_delay(self.retry_attempt);
+                let secs = delay.as_secs().max(1);
+                self.state.conn = ConnectionState::Retrying {
+                    attempt: self.retry_attempt,
+                    delay_secs: secs,
+                };
+                self.state.status_line = format!(
+                    "Daemon unreachable — retrying in {secs}s (attempt {}).",
+                    self.retry_attempt
+                );
+                delay
+            }
+            Err(e) => {
+                let msg = e.to_string();
+                self.state.conn = ConnectionState::TerminalError(msg.clone());
+                self.state.status_line =
+                    format!("Fatal: {msg} — check credentials/config and restart.");
+                Duration::from_secs(3600)
+            }
+        }
+    }
+
+    async fn attempt_tcp_reconnect(&mut self) {
+        if let Ok(transport) = TcpBoincTransport::connect(self.endpoint.clone()).await {
+            self.rpc = BoincRpcClient::new(Box::new(transport), self.password.clone());
+        }
     }
 
     async fn refresh(&mut self) -> AppResult<()> {
@@ -118,11 +177,11 @@ impl AppController {
         match action {
             UserAction::Quit => self.state.should_quit = true,
             UserAction::RefreshNow => {
-                if let Err(err) = self.refresh().await {
-                    self.state.status_line = format!("refresh failed: {err}");
-                } else {
-                    self.state.status_line = "refresh completed".to_string();
+                if matches!(self.state.conn, ConnectionState::Retrying { .. }) {
+                    self.attempt_tcp_reconnect().await;
                 }
+                let result = self.refresh().await;
+                self.process_refresh_result(result);
             }
             UserAction::CyclePane => {
                 self.state.focus = self.state.focus.next();
@@ -135,7 +194,8 @@ impl AppController {
                     self.state.status_line = format!("action failed: {err}");
                 } else {
                     self.state.status_line = "action succeeded".to_string();
-                    let _ = self.refresh().await;
+                    let result = self.refresh().await;
+                    self.process_refresh_result(result);
                 }
             }
         }

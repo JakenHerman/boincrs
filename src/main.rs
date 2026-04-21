@@ -11,10 +11,10 @@ async fn main() -> AppResult<()> {
         std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
     let password = load_password_from_env();
 
-    let transport = TcpBoincTransport::connect(endpoint).await?;
-    let mut rpc_client = BoincRpcClient::new(Box::new(transport), password);
+    let transport = TcpBoincTransport::connect(endpoint.clone()).await?;
+    let mut rpc_client = BoincRpcClient::new(Box::new(transport), password.clone());
     let _ = attach_projects_from_env(&mut rpc_client).await?;
-    let mut controller = AppController::new(rpc_client);
+    let mut controller = AppController::new(rpc_client, endpoint, password);
     controller.run().await
 }
 

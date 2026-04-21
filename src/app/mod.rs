@@ -2,4 +2,5 @@
 
 pub mod actions;
 pub mod controller;
+pub mod reconnect;
 pub mod state;

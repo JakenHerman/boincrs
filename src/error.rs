@@ -22,3 +22,17 @@ pub enum AppError {
     #[error("UI error: {0}")]
     Ui(String),
 }
+
+impl AppError {
+    /// Returns `true` for errors that may resolve on retry (network/socket/framing).
+    /// Returns `false` for errors that require human action (wrong password, etc.).
+    pub fn is_transient(&self) -> bool {
+        match self {
+            AppError::Io(_) => true,
+            AppError::Protocol(_) => true,
+            AppError::InvalidResponse(_) => true,
+            AppError::AuthenticationFailed => false,
+            AppError::Ui(_) => false,
+        }
+    }
+}
