@@ -8,6 +8,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- Reconnect backoff: transient RPC failures now trigger bounded exponential backoff
+  (1 s → 30 s, ±25% jitter) rather than a hard crash or silent stall. The daemon
+  connection is automatically re-established when the daemon returns.
+- Connection state tracking: `AppState` now carries a `ConnectionState` variant
+  (`Connected`, `Retrying`, `TerminalError`) so the UI always reflects liveness.
+- Actionable error UI: the status bar renders retrying state in yellow (with attempt
+  count and next-retry countdown) and fatal errors in bold red with restart guidance.
+  Press `r` to force an immediate reconnect attempt while in retrying state.
+- Error classification: `AppError::is_transient()` distinguishes recoverable failures
+  (I/O, protocol framing, invalid response) from terminal ones (auth failure, UI).
+- 15 integration tests covering error classification, backoff bounds, and the full
+  reconnect state-machine (transient failure → retrying → recovery → connected).
 - Transfer visibility: each transfer now shows direction (↑/↓), progress percentage,
   human-readable byte counts, current transfer speed, and error message when present.
 - Selection cursor in Projects and Transfers panes — `j/k` and arrow keys now navigate
