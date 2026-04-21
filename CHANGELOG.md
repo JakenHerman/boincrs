@@ -1,0 +1,31 @@
+# Changelog
+
+All notable changes to `boincrs` are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.1.0-beta] - 2026-04-20
+
+### Added
+- Initial Rust TUI foundation for local BOINC GUI RPC management.
+- Multi-pane UI for projects, tasks, and transfers.
+- Selected task detail header with progress, timing, deadline, and app info.
+- Keyboard navigation (`tab`, `j/k`, arrow keys) and action keybindings.
+- Status-aware task rendering with colorized icons and grouped headings.
+- PrimeGrid and Asteroids@home attach flow via project authenticators.
+- Project/task/transfer action commands and mode toggles.
+- Docs baseline: README, roadmap, contributing, support, architecture notes.
+
+### Changed
+- Task ordering now prioritizes:
+  1. ready-to-report
+  2. running (by completion descending)
+  3. waiting/ready tasks
+- Layout refined to emphasize task visibility and selected-task context.
+- Parser hardened for BOINC XML variations and flag-style tags.
+
+### Fixed
+- Auth handling aligned to nonce-hash (`md5(nonce + password)`).
+- Support for `ready_to_report` self-closing flags (`<ready_to_report/>`).
+- Improved resilience against nested/extra result tags in real BOINC payloads.

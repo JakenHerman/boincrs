@@ -115,6 +115,10 @@ BOINCRS_ASTEROIDS_ACCOUNT_KEY='…' \
 
 `ROADMAP.md`
 
+## Changelog
+
+`CHANGELOG.md`
+
 ## Contributing
 
 `CONTRIBUTING.md`
