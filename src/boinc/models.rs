@@ -48,6 +48,12 @@ pub struct Task {
     pub report_deadline: Option<f64>,
     /// Best-effort application/resource identifier.
     pub application: Option<String>,
+    /// Checkpointed CPU time in seconds (from active_task block).
+    pub checkpoint_cpu_time: Option<f64>,
+    /// When the workunit was received (UNIX epoch seconds).
+    pub received_time: Option<f64>,
+    /// Exit status code, non-zero indicates an error.
+    pub exit_status: Option<i32>,
 }
 
 /// BOINC transfer item from GUI RPC.

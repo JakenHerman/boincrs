@@ -44,6 +44,7 @@ pub enum UserAction {
     SetNetworkMode(RunMode),
     SetRunMode(RunMode),
     SetGpuMode(RunMode),
+    SaveDiagnostics,
 }
 
 impl UserAction {

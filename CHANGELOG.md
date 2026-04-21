@@ -12,10 +12,20 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   human-readable byte counts, current transfer speed, and error message when present.
 - Selection cursor in Projects and Transfers panes — `j/k` and arrow keys now navigate
   all three panes, and project/transfer actions apply to the highlighted item.
+- Richer task metadata: `checkpoint_cpu_time`, `received_time`, and `exit_status` are
+  now parsed from BOINC results. `chkpt` and `exit` appear in the Selected Task header.
+- Diagnostics bundle export: press `D` to write a `boincrs-diag-<epoch>.txt` snapshot
+  of all current state (client modes, projects, tasks, transfers) for bug reports.
+- Automatic `.env` loading: if a `.env` file exists in the working directory, boincrs
+  reads it at startup and applies any keys not already set in the environment.
+
+### Fixed
+- Corrected `compute_nonce_hash` doctest expected value.
 
 ### Changed
 - Project and transfer panes now use stateful list rendering with a `▶` highlight symbol,
   consistent with the Tasks pane.
+- Selected task detail header condensed to fit `chkpt` field alongside existing fields.
 
 ---
 

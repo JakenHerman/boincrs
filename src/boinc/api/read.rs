@@ -51,6 +51,9 @@ impl<'a> BoincReadApi<'a> {
                 remaining_seconds: item.remaining_seconds,
                 report_deadline: item.report_deadline,
                 application: item.application,
+                checkpoint_cpu_time: item.checkpoint_cpu_time,
+                received_time: item.received_time,
+                exit_status: item.exit_status,
             })
             .collect();
         tasks.sort_by(compare_tasks_for_view);

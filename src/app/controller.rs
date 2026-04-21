@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use crossterm::event::{self, Event};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen};
@@ -124,6 +124,7 @@ impl AppController {
             }
             UserAction::MoveUp => self.navigate_selection(true),
             UserAction::MoveDown => self.navigate_selection(false),
+            UserAction::SaveDiagnostics => self.save_diagnostics(),
             _ => {
                 if let Err(err) = self.dispatch_rpc_action(action).await {
                     self.state.status_line = format!("action failed: {err}");
@@ -208,9 +209,56 @@ impl AppController {
             | UserAction::CyclePane
             | UserAction::MoveUp
             | UserAction::MoveDown
+            | UserAction::SaveDiagnostics
             | UserAction::Quit => {}
         }
         Ok(())
+    }
+
+    fn save_diagnostics(&mut self) {
+        let ts = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        let path = format!("boincrs-diag-{ts}.txt");
+        let s = &self.state;
+        let mut out = format!(
+            "boincrs diagnostics — epoch {ts}\n\
+             client: run={:?} net={:?} gpu={:?} msgs={}\n\n",
+            s.client_state.run_mode,
+            s.client_state.network_mode,
+            s.client_state.gpu_mode,
+            s.client_state.messages.len(),
+        );
+        out.push_str(&format!("=== projects ({}) ===\n", s.projects.len()));
+        for p in &s.projects {
+            out.push_str(&format!(
+                "  {} | url:{} | suspended:{} | nmw:{}\n",
+                p.name, p.url, p.suspended_via_gui, p.dont_request_more_work
+            ));
+        }
+        out.push_str(&format!("\n=== tasks ({}) ===\n", s.tasks.len()));
+        for t in &s.tasks {
+            out.push_str(&format!(
+                "  {} | project:{} | status:{:?} | pct:{} | elapsed:{:?}s | remaining:{:?}s | deadline:{:?} | chkpt:{:?}s | exit:{:?} | app:{:?}\n",
+                t.name, t.project_url, t.status,
+                t.fraction_done.map(|v| format!("{:.1}%", v * 100.0)).unwrap_or_else(|| "n/a".into()),
+                t.elapsed_seconds, t.remaining_seconds, t.report_deadline,
+                t.checkpoint_cpu_time, t.exit_status, t.application,
+            ));
+        }
+        out.push_str(&format!("\n=== transfers ({}) ===\n", s.transfers.len()));
+        for tr in &s.transfers {
+            out.push_str(&format!(
+                "  {} | project:{} | upload:{} | status:{} | bytes:{:?}/{:?} | speed:{:?} | err:{:?}\n",
+                tr.file_name, tr.project_url, tr.is_upload, tr.status,
+                tr.bytes_xferred, tr.nbytes, tr.xfer_speed, tr.error_msg,
+            ));
+        }
+        match std::fs::write(&path, &out) {
+            Ok(()) => self.state.status_line = format!("diagnostics saved to {path}"),
+            Err(e) => self.state.status_line = format!("failed to save diagnostics: {e}"),
+        }
     }
 
     fn navigate_selection(&mut self, up: bool) {

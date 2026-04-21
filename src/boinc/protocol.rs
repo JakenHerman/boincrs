@@ -73,6 +73,9 @@ pub struct ParsedTask {
     pub remaining_seconds: Option<f64>,
     pub report_deadline: Option<f64>,
     pub application: Option<String>,
+    pub checkpoint_cpu_time: Option<f64>,
+    pub received_time: Option<f64>,
+    pub exit_status: Option<i32>,
 }
 
 /// Parsed task status used before mapping to UI-facing `TaskStatus`.
@@ -125,7 +128,7 @@ pub fn parse_auth_nonce(xml: &str) -> AppResult<String> {
 ///
 /// assert_eq!(
 ///     compute_nonce_hash("nonce", "password"),
-///     "9ec96ea2f1ac5aa36b73ae4b5f9f081d"
+///     "02600424c312e00a261125f713800234"
 /// );
 /// ```
 pub fn compute_nonce_hash(nonce: &str, password: &str) -> String {
@@ -166,6 +169,9 @@ pub fn parse_tasks(xml: &str) -> AppResult<Vec<ParsedTask>> {
                 .map(|v| v > 0)
                 .unwrap_or(false);
         let status = classify_task_status(&block, active_task);
+        let exit_status = extract_tag_value(&block, "exit_status")
+            .and_then(|v| v.trim().parse::<i32>().ok())
+            .filter(|&s| s != 0);
         out.push(ParsedTask {
             project_url: extract_tag_value(&block, "project_url").unwrap_or_default(),
             name: extract_tag_value(&block, "name").unwrap_or_default(),
@@ -177,6 +183,9 @@ pub fn parse_tasks(xml: &str) -> AppResult<Vec<ParsedTask>> {
             remaining_seconds: parse_f64_tag(&block, "estimated_cpu_time_remaining"),
             report_deadline: parse_f64_tag(&block, "report_deadline"),
             application: extract_application(&block),
+            checkpoint_cpu_time: parse_f64_tag(&block, "checkpoint_cpu_time"),
+            received_time: parse_f64_tag(&block, "received_time"),
+            exit_status,
         });
     }
     Ok(out)

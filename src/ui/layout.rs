@@ -63,7 +63,7 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     frame.render_stateful_widget(transfers, panes[2], &mut transfer_state);
 
     let footer = Paragraph::new(
-        "q quit | r refresh | tab cycle pane | j/k or arrows scroll tasks | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | 1-9 modes",
+        "q quit | r refresh | tab pane | j/k scroll | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | 1-9 modes | D diag",
     )
     .block(Block::default().borders(Borders::ALL).title("Keymap"));
     frame.render_widget(footer, vertical[2]);
@@ -111,24 +111,30 @@ fn selected_task_details(state: &AppState) -> String {
         .application
         .clone()
         .unwrap_or_else(|| "n/a".to_string());
+    let checkpoint = format_duration(task.checkpoint_cpu_time);
+    let exit_info = match task.exit_status {
+        Some(code) => format!(" | exit:{code}"),
+        None => String::new(),
+    };
 
     let line1 = format!(
-        "name:{} | project:{} | progress:{} | status:{}",
+        "name:{} | project:{} | progress:{} | status:{}{}",
         task.name,
         short_project(task.project_url.as_str()),
         progress,
         status,
+        exit_info,
     );
     let line2 = format!(
-        "elapsed:{} | remaining:{} | deadline:{} | application:{} | client: run:{:?} net:{:?} gpu:{:?} msgs:{}",
+        "elapsed:{} | chkpt:{} | remaining:{} | deadline:{} | app:{} | run:{:?} net:{:?} gpu:{:?}",
         elapsed,
+        checkpoint,
         remaining,
         deadline,
         application,
         state.client_state.run_mode,
         state.client_state.network_mode,
         state.client_state.gpu_mode,
-        state.client_state.messages.len()
     );
     format!("{line1}\n{line2}")
 }

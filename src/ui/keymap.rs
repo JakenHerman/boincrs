@@ -32,6 +32,7 @@ pub fn map_key_to_action(key: KeyEvent) -> Option<UserAction> {
         KeyCode::Char('7') => Some(UserAction::SetGpuMode(RunMode::Always)),
         KeyCode::Char('8') => Some(UserAction::SetGpuMode(RunMode::Auto)),
         KeyCode::Char('9') => Some(UserAction::SetGpuMode(RunMode::Never)),
+        KeyCode::Char('D') => Some(UserAction::SaveDiagnostics),
         _ => None,
     }
 }
