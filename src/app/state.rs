@@ -1,5 +1,5 @@
 use crate::app::actions::FocusPane;
-use crate::boinc::models::{ClientState, Project, Task, Transfer};
+use crate::boinc::models::{ClientState, Project, Task, TaskStatus, Transfer};
 
 /// Tracks the liveness of the BOINC daemon connection.
 #[derive(Debug, Clone, Default, PartialEq)]
@@ -28,6 +28,7 @@ pub struct AppState {
     pub selected_task_idx: usize,
     pub selected_project_idx: usize,
     pub selected_transfer_idx: usize,
+    pub show_active_only: bool,
 }
 
 impl AppState {
@@ -55,21 +56,34 @@ impl AppState {
             .map(|t| (t.project_url.as_str(), t.file_name.as_str()))
     }
 
+    pub fn toggle_active_filter(&mut self) {
+        self.show_active_only = !self.show_active_only;
+        self.selected_task_idx = 0;
+        self.selected_transfer_idx = 0;
+    }
+
     /// Tasks filtered to the currently selected project (all tasks when no project is selected).
+    /// When `show_active_only` is set, further limits to Running and ReadyToReport tasks.
     pub fn filtered_tasks(&self) -> Vec<&Task> {
         let url = self.selected_project_url();
         self.tasks
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| {
+                !self.show_active_only
+                    || matches!(t.status, TaskStatus::Running | TaskStatus::ReadyToReport)
+            })
             .collect()
     }
 
     /// Transfers filtered to the currently selected project (all transfers when no project is selected).
+    /// When `show_active_only` is set, further limits to actively transferring items.
     pub fn filtered_transfers(&self) -> Vec<&Transfer> {
         let url = self.selected_project_url();
         self.transfers
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| !self.show_active_only || t.xfer_speed.is_some_and(|s| s > 0.0))
             .collect()
     }
 
@@ -78,6 +92,10 @@ impl AppState {
         self.tasks
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| {
+                !self.show_active_only
+                    || matches!(t.status, TaskStatus::Running | TaskStatus::ReadyToReport)
+            })
             .nth(idx)
     }
 
@@ -86,6 +104,7 @@ impl AppState {
         self.transfers
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| !self.show_active_only || t.xfer_speed.is_some_and(|s| s > 0.0))
             .nth(idx)
     }
 
@@ -94,6 +113,10 @@ impl AppState {
         self.tasks
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| {
+                !self.show_active_only
+                    || matches!(t.status, TaskStatus::Running | TaskStatus::ReadyToReport)
+            })
             .count()
     }
 
@@ -102,6 +125,7 @@ impl AppState {
         self.transfers
             .iter()
             .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .filter(|t| !self.show_active_only || t.xfer_speed.is_some_and(|s| s > 0.0))
             .count()
     }
 

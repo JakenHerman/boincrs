@@ -33,14 +33,25 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     let filtered_tasks: Vec<_> = state.filtered_tasks().into_iter().cloned().collect();
     let filtered_transfers: Vec<_> = state.filtered_transfers().into_iter().cloned().collect();
 
+    let tasks_title = if state.show_active_only {
+        "Tasks [active]"
+    } else {
+        "Tasks"
+    };
+    let transfers_title = if state.show_active_only {
+        "Transfers [active]"
+    } else {
+        "Transfers"
+    };
+
     let projects = List::new(widgets::projects::items(&state.projects))
         .block(block("Projects", state.focus == FocusPane::Projects))
         .highlight_symbol("▶ ");
     let tasks = List::new(widgets::tasks::items(&filtered_tasks))
-        .block(block("Tasks", state.focus == FocusPane::Tasks))
+        .block(block(tasks_title, state.focus == FocusPane::Tasks))
         .highlight_symbol("▶ ");
     let transfers = List::new(widgets::transfers::items(&filtered_transfers))
-        .block(block("Transfers", state.focus == FocusPane::Transfers))
+        .block(block(transfers_title, state.focus == FocusPane::Transfers))
         .highlight_symbol("▶ ");
 
     let selected_task = Paragraph::new(selected_task_details(state)).block(
@@ -69,7 +80,7 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     frame.render_stateful_widget(transfers, panes[2], &mut transfer_state);
 
     let footer = Paragraph::new(
-        "q quit | r refresh | tab pane | j/k scroll | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | 1-9 modes | D diag",
+        "q quit | r refresh | tab pane | j/k scroll | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | A active-filter | 1-9 modes | D diag",
     )
     .block(Block::default().borders(Borders::ALL).title("Keymap"));
     frame.render_widget(footer, vertical[2]);
