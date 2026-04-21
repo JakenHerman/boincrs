@@ -189,6 +189,11 @@ impl AppController {
             UserAction::MoveUp => self.navigate_selection(true),
             UserAction::MoveDown => self.navigate_selection(false),
             UserAction::SaveDiagnostics => self.save_diagnostics(),
+            UserAction::ToggleActiveFilter => {
+                self.state.toggle_active_filter();
+                let label = if self.state.show_active_only { "on" } else { "off" };
+                self.state.status_line = format!("Active-only filter: {label}");
+            }
             _ => {
                 if let Err(err) = self.dispatch_rpc_action(action).await {
                     self.state.status_line = format!("action failed: {err}");
@@ -275,6 +280,7 @@ impl AppController {
             | UserAction::MoveUp
             | UserAction::MoveDown
             | UserAction::SaveDiagnostics
+            | UserAction::ToggleActiveFilter
             | UserAction::Quit => {}
         }
         Ok(())

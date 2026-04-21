@@ -41,6 +41,7 @@ pub enum UserAction {
     TaskResume,
     TaskAbort,
     TransferRetry,
+    ToggleActiveFilter,
     SetNetworkMode(RunMode),
     SetRunMode(RunMode),
     SetGpuMode(RunMode),
