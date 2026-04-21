@@ -2,20 +2,15 @@ use crate::app::actions::FocusPane;
 use crate::boinc::models::{ClientState, Project, Task, Transfer};
 
 /// Tracks the liveness of the BOINC daemon connection.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub enum ConnectionState {
     /// Last RPC succeeded; normal operation.
+    #[default]
     Connected,
     /// Transient failure; will retry after `delay_secs` seconds.
     Retrying { attempt: u32, delay_secs: u64 },
     /// Non-recoverable failure (e.g. wrong password). User action required.
     TerminalError(String),
-}
-
-impl Default for ConnectionState {
-    fn default() -> Self {
-        ConnectionState::Connected
-    }
 }
 
 /// In-memory state consumed by renderer and controller logic.
