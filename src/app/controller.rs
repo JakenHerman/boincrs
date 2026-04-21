@@ -191,7 +191,11 @@ impl AppController {
             UserAction::SaveDiagnostics => self.save_diagnostics(),
             UserAction::ToggleActiveFilter => {
                 self.state.toggle_active_filter();
-                let label = if self.state.show_active_only { "on" } else { "off" };
+                let label = if self.state.show_active_only {
+                    "on"
+                } else {
+                    "off"
+                };
                 self.state.status_line = format!("Active-only filter: {label}");
             }
             _ => {
