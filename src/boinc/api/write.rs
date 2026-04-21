@@ -43,7 +43,8 @@ impl<'a> BoincWriteApi<'a> {
 
     /// Allows project to request new work again.
     pub async fn project_allow_more_work(&mut self, project_url: &str) -> AppResult<String> {
-        self.project_simple("project_allowmorework", project_url).await
+        self.project_simple("project_allowmorework", project_url)
+            .await
     }
 
     /// Resets project (destructive).
@@ -57,7 +58,11 @@ impl<'a> BoincWriteApi<'a> {
     }
 
     /// Attaches a BOINC project using account authenticator key.
-    pub async fn project_attach(&mut self, project_url: &str, authenticator: &str) -> AppResult<String> {
+    pub async fn project_attach(
+        &mut self,
+        project_url: &str,
+        authenticator: &str,
+    ) -> AppResult<String> {
         let payload = format!(
             "<project_url>{project_url}</project_url><authenticator>{authenticator}</authenticator>"
         );
@@ -65,33 +70,51 @@ impl<'a> BoincWriteApi<'a> {
     }
 
     /// Sends a task-level action for a specific project/result.
-    pub async fn task_action(&mut self, command: &str, project_url: &str, task_name: &str) -> AppResult<String> {
+    pub async fn task_action(
+        &mut self,
+        command: &str,
+        project_url: &str,
+        task_name: &str,
+    ) -> AppResult<String> {
         let payload = format!("<project_url>{project_url}</project_url><name>{task_name}</name>");
         self.rpc.call(command, &payload).await
     }
 
     /// Suspends a task.
     pub async fn task_suspend(&mut self, project_url: &str, task_name: &str) -> AppResult<String> {
-        self.task_action("result_suspend", project_url, task_name).await
+        self.task_action("result_suspend", project_url, task_name)
+            .await
     }
 
     /// Resumes a task.
     pub async fn task_resume(&mut self, project_url: &str, task_name: &str) -> AppResult<String> {
-        self.task_action("result_resume", project_url, task_name).await
+        self.task_action("result_resume", project_url, task_name)
+            .await
     }
 
     /// Aborts a task (destructive).
     pub async fn task_abort(&mut self, project_url: &str, task_name: &str) -> AppResult<String> {
-        self.task_action("result_abort", project_url, task_name).await
+        self.task_action("result_abort", project_url, task_name)
+            .await
     }
 
     /// Retries a failed transfer.
-    pub async fn transfer_retry(&mut self, project_url: &str, file_name: &str) -> AppResult<String> {
-        let payload = format!("<project_url>{project_url}</project_url><filename>{file_name}</filename>");
+    pub async fn transfer_retry(
+        &mut self,
+        project_url: &str,
+        file_name: &str,
+    ) -> AppResult<String> {
+        let payload =
+            format!("<project_url>{project_url}</project_url><filename>{file_name}</filename>");
         self.rpc.call("retry_file_transfer", &payload).await
     }
 
-    async fn set_mode(&mut self, command: &str, mode: RunMode, duration_secs: u64) -> AppResult<String> {
+    async fn set_mode(
+        &mut self,
+        command: &str,
+        mode: RunMode,
+        duration_secs: u64,
+    ) -> AppResult<String> {
         let payload = format!(
             "<{mode_tag}/><duration>{duration_secs}</duration>",
             mode_tag = mode.as_boinc_tag()
@@ -105,7 +128,11 @@ impl<'a> BoincWriteApi<'a> {
     }
 
     /// Sets BOINC network mode.
-    pub async fn set_network_mode(&mut self, mode: RunMode, duration_secs: u64) -> AppResult<String> {
+    pub async fn set_network_mode(
+        &mut self,
+        mode: RunMode,
+        duration_secs: u64,
+    ) -> AppResult<String> {
         self.set_mode("set_network_mode", mode, duration_secs).await
     }
 
