@@ -30,13 +30,16 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
         ])
         .split(vertical[1]);
 
+    let filtered_tasks: Vec<_> = state.filtered_tasks().into_iter().cloned().collect();
+    let filtered_transfers: Vec<_> = state.filtered_transfers().into_iter().cloned().collect();
+
     let projects = List::new(widgets::projects::items(&state.projects))
         .block(block("Projects", state.focus == FocusPane::Projects))
         .highlight_symbol("▶ ");
-    let tasks = List::new(widgets::tasks::items(&state.tasks))
+    let tasks = List::new(widgets::tasks::items(&filtered_tasks))
         .block(block("Tasks", state.focus == FocusPane::Tasks))
         .highlight_symbol("▶ ");
-    let transfers = List::new(widgets::transfers::items(&state.transfers))
+    let transfers = List::new(widgets::transfers::items(&filtered_transfers))
         .block(block("Transfers", state.focus == FocusPane::Transfers))
         .highlight_symbol("▶ ");
 
@@ -54,13 +57,13 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     frame.render_stateful_widget(projects, panes[0], &mut project_state);
 
     let mut task_state = ListState::default();
-    if !state.tasks.is_empty() {
+    if !filtered_tasks.is_empty() {
         task_state.select(Some(state.selected_task_idx));
     }
     frame.render_stateful_widget(tasks, panes[1], &mut task_state);
 
     let mut transfer_state = ListState::default();
-    if !state.transfers.is_empty() {
+    if !filtered_transfers.is_empty() {
         transfer_state.select(Some(state.selected_transfer_idx));
     }
     frame.render_stateful_widget(transfers, panes[2], &mut transfer_state);

@@ -38,54 +38,110 @@ impl AppState {
             .map(|p| p.url.as_str())
     }
 
-    /// Returns `(project_url, task_name)` for selected task.
+    /// Returns `(project_url, task_name)` for the selected task within the filtered list.
     pub fn selected_task(&self) -> Option<(&str, &str)> {
-        self.tasks
-            .get(self.selected_task_idx)
+        self.filtered_task_at(self.selected_task_idx)
             .map(|t| (t.project_url.as_str(), t.name.as_str()))
     }
 
-    /// Returns selected task reference.
+    /// Returns selected task reference within the filtered list.
     pub fn selected_task_ref(&self) -> Option<&Task> {
-        self.tasks.get(self.selected_task_idx)
+        self.filtered_task_at(self.selected_task_idx)
     }
 
-    /// Returns selected transfer tuple `(project_url, file_name)`.
+    /// Returns selected transfer tuple `(project_url, file_name)` within the filtered list.
     pub fn selected_transfer(&self) -> Option<(&str, &str)> {
-        self.transfers
-            .get(self.selected_transfer_idx)
+        self.filtered_transfer_at(self.selected_transfer_idx)
             .map(|t| (t.project_url.as_str(), t.file_name.as_str()))
+    }
+
+    /// Tasks filtered to the currently selected project (all tasks when no project is selected).
+    pub fn filtered_tasks(&self) -> Vec<&Task> {
+        let url = self.selected_project_url();
+        self.tasks
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .collect()
+    }
+
+    /// Transfers filtered to the currently selected project (all transfers when no project is selected).
+    pub fn filtered_transfers(&self) -> Vec<&Transfer> {
+        let url = self.selected_project_url();
+        self.transfers
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .collect()
+    }
+
+    fn filtered_task_at(&self, idx: usize) -> Option<&Task> {
+        let url = self.selected_project_url();
+        self.tasks
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .nth(idx)
+    }
+
+    fn filtered_transfer_at(&self, idx: usize) -> Option<&Transfer> {
+        let url = self.selected_project_url();
+        self.transfers
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .nth(idx)
+    }
+
+    fn filtered_tasks_len(&self) -> usize {
+        let url = self.selected_project_url();
+        self.tasks
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .count()
+    }
+
+    fn filtered_transfers_len(&self) -> usize {
+        let url = self.selected_project_url();
+        self.transfers
+            .iter()
+            .filter(|t| url.is_none_or(|u| t.project_url == u))
+            .count()
     }
 
     /// Clamps all selection indices after a data refresh.
     pub fn normalize_selection(&mut self) {
-        self.selected_task_idx = clamp_idx(self.selected_task_idx, self.tasks.len());
+        // Clamp project first so filtered lengths below reflect the valid project.
         self.selected_project_idx = clamp_idx(self.selected_project_idx, self.projects.len());
-        self.selected_transfer_idx = clamp_idx(self.selected_transfer_idx, self.transfers.len());
+        self.selected_task_idx = clamp_idx(self.selected_task_idx, self.filtered_tasks_len());
+        self.selected_transfer_idx =
+            clamp_idx(self.selected_transfer_idx, self.filtered_transfers_len());
     }
 
     pub fn move_task_selection_up(&mut self) {
-        self.selected_task_idx = move_up(self.selected_task_idx, self.tasks.len());
+        self.selected_task_idx = move_up(self.selected_task_idx, self.filtered_tasks_len());
     }
 
     pub fn move_task_selection_down(&mut self) {
-        self.selected_task_idx = move_down(self.selected_task_idx, self.tasks.len());
+        self.selected_task_idx = move_down(self.selected_task_idx, self.filtered_tasks_len());
     }
 
     pub fn move_project_selection_up(&mut self) {
         self.selected_project_idx = move_up(self.selected_project_idx, self.projects.len());
+        self.selected_task_idx = 0;
+        self.selected_transfer_idx = 0;
     }
 
     pub fn move_project_selection_down(&mut self) {
         self.selected_project_idx = move_down(self.selected_project_idx, self.projects.len());
+        self.selected_task_idx = 0;
+        self.selected_transfer_idx = 0;
     }
 
     pub fn move_transfer_selection_up(&mut self) {
-        self.selected_transfer_idx = move_up(self.selected_transfer_idx, self.transfers.len());
+        self.selected_transfer_idx =
+            move_up(self.selected_transfer_idx, self.filtered_transfers_len());
     }
 
     pub fn move_transfer_selection_down(&mut self) {
-        self.selected_transfer_idx = move_down(self.selected_transfer_idx, self.transfers.len());
+        self.selected_transfer_idx =
+            move_down(self.selected_transfer_idx, self.filtered_transfers_len());
     }
 }
 
