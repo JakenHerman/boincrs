@@ -70,4 +70,3 @@ fn read_env_trimmed(key: &str) -> Option<String> {
         .map(|v| v.trim().to_string())
         .filter(|v| !v.is_empty())
 }
-

@@ -14,7 +14,8 @@ fn required_env(key: &str) -> String {
 #[tokio::test]
 #[ignore = "requires live BOINC and valid account keys"]
 async fn live_primegrid_and_asteroids_attach_and_visibility() {
-    let endpoint = std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
+    let endpoint =
+        std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
     let password_file = std::env::var("BOINCRS_PASSWORD_FILE")
         .unwrap_or_else(|_| "/etc/boinc-client/gui_rpc_auth.cfg".to_string());
     let password = std::fs::read_to_string(password_file)
@@ -57,11 +58,16 @@ async fn live_primegrid_and_asteroids_attach_and_visibility() {
     tokio::time::sleep(std::time::Duration::from_secs(3)).await;
 
     let mut read_api = BoincReadApi::new(&mut client);
-    let projects = read_api.projects().await.expect("projects read should succeed");
+    let projects = read_api
+        .projects()
+        .await
+        .expect("projects read should succeed");
     let tasks = read_api.tasks().await.expect("tasks read should succeed");
 
     let has_primegrid = projects.iter().any(|p| p.url.contains("primegrid.com"));
-    let has_asteroids = projects.iter().any(|p| p.url.contains("asteroidsathome.net"));
+    let has_asteroids = projects
+        .iter()
+        .any(|p| p.url.contains("asteroidsathome.net"));
     assert!(has_primegrid, "primegrid should appear in project list");
     assert!(has_asteroids, "asteroids should appear in project list");
 
