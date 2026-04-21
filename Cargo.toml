@@ -1,0 +1,17 @@
+[package]
+name = "boincrs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = "0.1"
+crossterm = "0.29"
+md5 = "0.8"
+quick-xml = { version = "0.38", features = ["serialize"] }
+ratatui = "0.29"
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "io-util", "time"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "net", "io-util", "time"] }

@@ -1,0 +1,24 @@
+use thiserror::Error;
+
+/// Common result type used throughout `boincrs`.
+pub type AppResult<T> = Result<T, AppError>;
+
+/// Top-level error type used by transport, protocol, and UI layers.
+#[derive(Debug, Error)]
+pub enum AppError {
+    /// Underlying I/O failure (network/socket/terminal).
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+    /// Protocol-level request/response handling failure.
+    #[error("RPC protocol error: {0}")]
+    Protocol(String),
+    /// BOINC GUI RPC authentication rejected credentials.
+    #[error("RPC authentication failed")]
+    AuthenticationFailed,
+    /// BOINC response payload was malformed or missing required fields.
+    #[error("Invalid BOINC response: {0}")]
+    InvalidResponse(String),
+    /// UI/runtime interaction error.
+    #[error("UI error: {0}")]
+    Ui(String),
+}

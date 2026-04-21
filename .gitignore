@@ -1,0 +1,29 @@
+# Rust build output
+/target/
+
+# Cargo artifacts
+Cargo.lock
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.secret
+*.secrets
+*.key
+*.pem
+
+# Logs and runtime files
+*.log
+*.pid
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
