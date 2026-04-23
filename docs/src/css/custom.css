@@ -1,0 +1,165 @@
+/**
+ * boincrs docs — custom theme.
+ *
+ * The palette leans into terminal aesthetics: deep background, phosphor-green
+ * accents, muted neutrals, and high contrast for readability.
+ */
+
+:root {
+  --ifm-color-primary: #2f8f5f;
+  --ifm-color-primary-dark: #2a8055;
+  --ifm-color-primary-darker: #277950;
+  --ifm-color-primary-darkest: #206442;
+  --ifm-color-primary-light: #349e69;
+  --ifm-color-primary-lighter: #38a66f;
+  --ifm-color-primary-lightest: #4fba82;
+  --ifm-code-font-size: 92%;
+  --ifm-font-family-monospace: "JetBrains Mono", "Fira Code", ui-monospace,
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+  --ifm-heading-font-weight: 700;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.06);
+  --boincrs-terminal-bg: #0b0f0c;
+  --boincrs-terminal-fg: #c8f5d6;
+  --boincrs-terminal-dim: #6a8a74;
+  --boincrs-terminal-accent: #4fba82;
+  --boincrs-terminal-warn: #f5c465;
+  --boincrs-terminal-error: #e06c75;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4fba82;
+  --ifm-color-primary-dark: #3dae74;
+  --ifm-color-primary-darker: #38a56e;
+  --ifm-color-primary-darkest: #2d8859;
+  --ifm-color-primary-light: #63c692;
+  --ifm-color-primary-lighter: #72cc9c;
+  --ifm-color-primary-lightest: #97dbb6;
+  --ifm-background-color: #0b0f0c;
+  --ifm-background-surface-color: #0f1512;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.08);
+}
+
+html {
+  font-feature-settings: 'ss01', 'cv02', 'cv11';
+}
+
+.navbar {
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .navbar {
+  background-color: rgba(11, 15, 12, 0.85);
+  backdrop-filter: saturate(140%) blur(8px);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.footer--dark {
+  --ifm-footer-background-color: #07090a;
+}
+
+/* Subtle scanline shimmer used by the landing page hero. */
+.boincrs-terminal {
+  font-family: var(--ifm-font-family-monospace);
+  background: var(--boincrs-terminal-bg);
+  color: var(--boincrs-terminal-fg);
+  border-radius: 14px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  line-height: 1.45;
+  position: relative;
+  /* Cap at container width when stacked on narrow screens; on wide screens
+     the grid track uses `min-content`, which sizes exactly to the monospace
+     frame so nothing clips. `overflow: hidden` keeps the rounded corners clean. */
+  max-width: 100%;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 20px 70px -20px rgba(0, 0, 0, 0.55),
+    0 0 60px -10px rgba(79, 186, 130, 0.25);
+}
+
+.boincrs-terminal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.018) 0,
+      rgba(255, 255, 255, 0.018) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  pointer-events: none;
+}
+
+.boincrs-terminal__chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.boincrs-terminal__chrome span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  background: #3a3f3c;
+}
+
+.boincrs-terminal__chrome span:nth-child(1) { background: #ff5f57; }
+.boincrs-terminal__chrome span:nth-child(2) { background: #febc2e; }
+.boincrs-terminal__chrome span:nth-child(3) { background: #28c840; }
+
+.boincrs-terminal__chrome strong {
+  margin-left: 0.75rem;
+  font-weight: 500;
+  font-size: 0.78rem;
+  color: var(--boincrs-terminal-dim);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.boincrs-terminal pre {
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 0.85rem;
+  white-space: pre;
+  /* Safety net: if the container is ever narrower than the frame
+     (e.g. a very small mobile viewport), allow horizontal scroll
+     rather than clipping glyphs. */
+  overflow-x: auto;
+}
+
+.boincrs-terminal .t-accent { color: var(--boincrs-terminal-accent); }
+.boincrs-terminal .t-warn   { color: var(--boincrs-terminal-warn); }
+.boincrs-terminal .t-error  { color: var(--boincrs-terminal-error); }
+.boincrs-terminal .t-dim    { color: var(--boincrs-terminal-dim); }
+.boincrs-terminal .t-focus  {
+  /* Must not add horizontal padding: the terminal preview uses
+     monospace character alignment, and extra padding would shift
+     every glyph to the right of the badge. Color + weight only. */
+  background: var(--boincrs-terminal-accent);
+  color: #07110b;
+  border-radius: 2px;
+  font-weight: 700;
+}
+
+article a code,
+article p code,
+article li code {
+  background: var(--ifm-color-emphasis-200);
+  border-radius: 4px;
+}
+
+/* Admonitions lean terminal-ish. */
+.theme-admonition {
+  border-radius: 10px;
+}
+
+/* Compact code-in-table. */
+table code {
+  white-space: nowrap;
+}
