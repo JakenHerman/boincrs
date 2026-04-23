@@ -21,6 +21,9 @@ pub enum AppError {
     /// UI/runtime interaction error.
     #[error("UI error: {0}")]
     Ui(String),
+    /// Configuration input was invalid (template slug, profile, env var).
+    #[error("configuration error: {0}")]
+    Config(String),
 }
 
 impl AppError {
@@ -33,6 +36,7 @@ impl AppError {
             AppError::InvalidResponse(_) => true,
             AppError::AuthenticationFailed => false,
             AppError::Ui(_) => false,
+            AppError::Config(_) => false,
         }
     }
 }

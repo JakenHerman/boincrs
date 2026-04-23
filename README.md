@@ -76,6 +76,30 @@ set -a && source .env && set +a   # Linux/macOS
 
 With `BOINCRS_PRIMEGRID_ACCOUNT_KEY` / `BOINCRS_ASTEROIDS_ACCOUNT_KEY` set, startup runs `project_attach` then `project_update` for those projects.
 
+### Project templates and preset profiles
+
+`boincrs` ships a curated registry of well-known BOINC projects so you can attach them by **slug** rather than memorizing each master URL. Known slugs: `asteroids`, `einstein`, `gpugrid`, `lhc`, `milkyway`, `primegrid`, `rosetta`, `seti`, `worldcommunitygrid`, `yoyo`.
+
+Attach by template via `BOINCRS_ATTACH_TEMPLATES` (semicolon-delimited `slug|account_key`):
+
+```bash
+export BOINCRS_ATTACH_TEMPLATES='rosetta|ACCOUNT_KEY_A;einstein|ACCOUNT_KEY_B'
+```
+
+For repeatable setups, use a **preset profile** file (`key = value` format) and point `BOINCRS_PROFILE_FILE` at it:
+
+```ini
+# boincrs.profile
+name = desktop
+run_mode = auto
+network_mode = auto
+gpu_mode = never
+attach = primegrid|ACCOUNT_KEY_A
+attach = rosetta|ACCOUNT_KEY_B
+```
+
+Invalid slugs, URLs, or mode values are rejected with line-level validation errors so you see exactly what to fix. See [`docs/architecture/project-templates-and-profiles.md`](docs/architecture/project-templates-and-profiles.md) for the full schema.
+
 ### Run
 
 ```bash
@@ -166,6 +190,7 @@ Do not commit real `.env` values. Treat GUI RPC password and project authenticat
 - `docs/architecture/app-controller.md`
 - `docs/architecture/smoke-checklist.md`
 - `docs/architecture/beta-primegrid-asteroids.md`
+- `docs/architecture/project-templates-and-profiles.md`
 - `docs/compatibility-matrix.md`
 - `docs/release-checklist.md`
 - `docs/decisions/0001-error-handling.md`

@@ -6,6 +6,8 @@
 pub mod api;
 pub mod bootstrap;
 pub mod models;
+pub mod profiles;
 pub mod protocol;
 pub mod rpc_client;
+pub mod templates;
 pub mod transport;

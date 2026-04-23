@@ -8,6 +8,10 @@
 - `BOINCRS_ASTEROIDS_ACCOUNT_KEY`: Asteroids@home account key
 - `BOINCRS_ATTACH_PROJECTS`: optional custom list in the form:
   - `https://example.com/boinc/|account_key;https://example2.com/|account_key2`
+- `BOINCRS_ATTACH_TEMPLATES`: curated-slug list, e.g. `primegrid|KEY1;rosetta|KEY2`
+  (see `docs/architecture/project-templates-and-profiles.md`).
+- `BOINCRS_PROFILE_FILE`: path to a preset profile bundling attach entries
+  and CPU/network/GPU mode overrides.
 
 When any of these are provided, startup performs:
 1. `project_attach`

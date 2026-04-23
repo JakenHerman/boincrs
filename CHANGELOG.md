@@ -8,6 +8,25 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ## [Unreleased]
 
 ### Added
+- **Project attach templates**: curated registry of well-known BOINC projects
+  (`asteroids`, `einstein`, `gpugrid`, `lhc`, `milkyway`, `primegrid`,
+  `rosetta`, `seti`, `worldcommunitygrid`, `yoyo`) with canonical master URLs,
+  summaries, and category tags. Users can attach by slug via
+  `BOINCRS_ATTACH_TEMPLATES=slug|key;...` without memorizing project URLs.
+  Unknown slugs yield a clear error listing every known option.
+- **Preset profiles**: new `key = value` profile format bundling attach
+  entries plus CPU/network/GPU run-mode overrides. Load via
+  `BOINCRS_PROFILE_FILE=...`. Every validation error reports the offending
+  line number and key; unknown keys are rejected to prevent silent
+  mis-configuration.
+- Input validation for project URLs (scheme, host, whitespace) and profile
+  names (ASCII alphanumeric, `-`, `_`), surfaced as `AppError::Config` so
+  startup failures are distinguishable from transient RPC errors.
+- `BootstrapReport` returned from `attach_projects_from_env`, summarizing
+  attached URLs, skipped entries with reasons, and which run-mode overrides
+  were applied from the active profile.
+- Architecture note `docs/architecture/project-templates-and-profiles.md`
+  documenting the registry, profile schema, and startup flow.
 - Reconnect backoff: transient RPC failures now trigger bounded exponential backoff
   (1 s → 30 s, ±25% jitter) rather than a hard crash or silent stall. The daemon
   connection is automatically re-established when the daemon returns.
