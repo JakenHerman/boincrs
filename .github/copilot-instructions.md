@@ -15,6 +15,10 @@ public documentation site.
 - **Docs site (public):** Docusaurus under `docs/`, deployed to
   [jakenherman.github.io/boincrs](https://jakenherman.github.io/boincrs) by
   `.github/workflows/docs.yml`.
+- **Releases:** fully automated by
+  [release-plz](https://release-plz.ieni.dev/) from Conventional Commits on
+  `main`. See the [Changelog & release
+  protocol](#changelog--release-protocol) section below.
 
 ## Core code rules
 
@@ -67,7 +71,7 @@ incomplete and should not be proposed.
 | Selected-task header, focus cues, status labels, confirmation flow (`src/ui/**`)    | `docs/guide/usage.md`, `docs/guide/accessibility.md`                                 |
 | Reconnect / backoff / error classification (`src/error.rs`, controller)             | `docs/guide/usage.md`, `docs/guide/decisions/0001-error-handling.md`                 |
 | New architecture module or significant controller refactor                          | `docs/guide/architecture/**` (new or updated page) + `docs/sidebars.js`              |
-| Roadmap milestone complete / changed                                                | `docs/guide/roadmap.md`, `docs/guide/changelog.md`, root `CHANGELOG.md`              |
+| Roadmap milestone complete / changed                                                | `docs/guide/roadmap.md`                                                              |
 | New supported BOINC target / dropped target                                         | `docs/guide/compatibility.md`, `docs/guide/release-checklist.md`, CI matrix          |
 | Release process / sign-off gate                                                     | `docs/guide/release-checklist.md`                                                    |
 | Diagnostics bundle format / output path                                             | `docs/guide/usage.md` (section on diagnostics bundle)                                |
@@ -84,13 +88,12 @@ assuming a docs update **is** needed unless this reasoning is explicit.
   `SUPPORT.md`, and `ROADMAP.md` are pointers to the docs site. Do not
   re-expand them into long-form docs — expand the corresponding
   `docs/guide/*.md` instead, and have the root file link to it.
-- **`CHANGELOG.md` is canonical.** Update the root `CHANGELOG.md` first,
-  then mirror the changes in `docs/guide/changelog.md` in the same PR. The
-  `Changelog entry required` GitHub Actions job will fail the PR if a
-  user-visible path changes without a new bullet under `## [Unreleased]`.
-  Bypass only when truly not user-visible by adding the `skip-changelog`
-  label or `[skip-changelog]` in the PR body — and justify the bypass in
-  the PR description.
+- **`CHANGELOG.md` is owned by release-plz.** Do not hand-edit it in a
+  feature PR. The file is regenerated from Conventional Commit subjects when
+  release-plz opens its `chore: release` PR. The same applies to the
+  `version` field in `Cargo.toml` and the matching row in `Cargo.lock`.
+- **`docs/guide/changelog.md` is a stub** that links to the GitHub Releases
+  page — not a mirror. Do not add release bullets there.
 - **New guide pages must be registered** in `docs/sidebars.js` under
   `guideSidebar` and cross-linked from at least one existing page.
 - **Preserve front-matter `id:` values** and existing heading anchors. Renaming
@@ -114,19 +117,82 @@ assuming a docs update **is** needed unless this reasoning is explicit.
 - Keep imperative tone ("Run …", "Set …") in step-by-step guides.
 - Link back to related pages instead of duplicating content.
 
+## Changelog & release protocol
+
+Releases are **fully automated** by
+[release-plz](https://release-plz.ieni.dev/). See `release-plz.toml`,
+`.github/workflows/release-plz.yml`, and `.github/workflows/release.yml`.
+
+### The one rule: use Conventional Commits
+
+Every commit that lands on `main` — directly, or as the squash-merge subject
+of a PR — **must** use a
+[Conventional Commit](https://www.conventionalcommits.org/) subject.
+release-plz reads these commits to decide whether a new release is due and
+how much to bump the version.
+
+| Subject prefix | User-visible? | Triggers release? | Bump |
+| --- | --- | --- | --- |
+| `feat: …` | yes | yes | MINOR (e.g. `0.2.0 → 0.3.0`) |
+| `fix: …` | yes | yes | PATCH (e.g. `0.2.0 → 0.2.1`) |
+| `perf: …` | yes | yes | PATCH |
+| `feat!: …` or `BREAKING CHANGE:` footer | yes | yes | MINOR pre-1.0, MAJOR after |
+| `docs: …` | no | no | — |
+| `refactor:`, `chore:`, `test:`, `ci:`, `style:`, `build:` | no | no | — |
+
+Scopes are optional but encouraged (`feat(ui): …`, `fix(boinc): …`,
+`docs(configuration): …`).
+
+The subject **is** the changelog entry. Write it in imperative mood, one
+line, no trailing period, no ticket IDs unless they add real context.
+
+Good examples:
+
+- `feat(ui): show checkpoint time in selected-task header`
+- `fix(persist): sanitize colons in save filenames on Windows`
+- `feat!(boinc): rename BoincTransport::connect to open`
+
+### What Copilot must do
+
+1. **Pick the right prefix.** If the change is user-visible, it must be
+   `feat`, `fix`, `feat!`, or `perf` — never `chore` or `refactor`. Default
+   to `feat` / `fix` when unsure.
+2. **Write the subject like a changelog entry.** It will appear verbatim in
+   `CHANGELOG.md`.
+3. **Still update `docs/`** in the same PR for any user-visible change (see
+   the trigger table above).
+4. **Never hand-edit `CHANGELOG.md`, the `version` row in `Cargo.toml`, or
+   the matching row in `Cargo.lock`** in a feature PR. release-plz owns
+   them.
+
+### How releases actually ship
+
+Informational only — Copilot does not run any of these steps.
+
+1. Conventional commits land on `main`.
+2. release-plz opens (or updates) a `chore: release` PR that bumps
+   `Cargo.toml`, refreshes `Cargo.lock`, and appends an entry to
+   `CHANGELOG.md`.
+3. A maintainer reviews and merges the Release PR.
+4. release-plz pushes the `vX.Y.Z` tag and creates the GitHub Release.
+5. The tag push triggers `release.yml`, which builds Linux / macOS / Windows
+   binaries and attaches them to that release.
+
 ## Commit and PR hygiene
 
-- Commit message: `<area>: <short imperative summary>` where `<area>` is
-  something like `ui`, `boinc`, `app`, `docs`, `ci`, `errors`, etc.
-- Use the repository's PR template (`.github/pull_request_template.md`) and
-  fill in every section — **Summary**, **Changes**, **Docs impact**,
-  **Changelog**, **Verification**. Don't delete the template; answer it.
-- If the change is user-visible, the PR must:
-  - Update the matching `docs/guide/**` page(s).
-  - Add a bullet under `## [Unreleased]` in `CHANGELOG.md`.
+- **Commit subjects must be Conventional Commits** — see the protocol above.
+- A good PR description mentions both the code change and the docs change.
+  If a Copilot-opened PR touches user-facing behavior without a matching
+  `docs/` diff, treat the PR as incomplete.
+- Run `cargo fmt` and `cargo clippy -- -D warnings` locally before pushing
+  to avoid CI round-trips.
+- Do not bump `version` in `Cargo.toml`, touch `Cargo.lock`'s version rows,
+  or edit `CHANGELOG.md` as part of a feature PR — release-plz owns those
+  files.
 - Never commit `.env` contents, GUI RPC passwords, or project authenticators.
 
 ## When uncertain
 
 If Copilot is unsure whether a change is user-visible, default to updating
-the docs. Over-documenting is cheaper than drift.
+the docs **and** using `feat` / `fix` for the commit subject. Over-documenting
+and over-bulleting the changelog are both cheaper than drift.

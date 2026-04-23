@@ -1,0 +1,103 @@
+name: Release
+
+# Tag-triggered binary builds.
+#
+# The GitHub Release itself is created by release-plz when the "chore: release"
+# PR is merged (see release-plz.yml and release-plz.toml). This workflow runs
+# on the resulting `v*` tag push and ONLY attaches prebuilt Linux, macOS, and
+# Windows binaries to that existing release. It does not generate release
+# notes — those come from CHANGELOG.md via release-plz.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --locked
+      - name: Package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          strip target/release/boincrs
+          mkdir pack
+          cp target/release/boincrs pack/boincrs
+          mkdir dist
+          tar czvf "dist/boincrs-${VERSION}-x86_64-unknown-linux-gnu.tar.gz" -C pack boincrs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-tarball
+          path: dist/*.tar.gz
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --locked
+      - name: Package
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Compress-Archive -Path target/release/boincrs.exe -DestinationPath "dist/boincrs-${version}-x86_64-pc-windows-msvc.zip" -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: dist/*.zip
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --locked --target aarch64-apple-darwin
+      - run: cargo build --release --locked --target x86_64-apple-darwin
+      - name: Package
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p dist pack-aarch64 pack-x86_64
+          cp target/aarch64-apple-darwin/release/boincrs pack-aarch64/boincrs
+          cp target/x86_64-apple-darwin/release/boincrs pack-x86_64/boincrs
+          chmod +x pack-aarch64/boincrs pack-x86_64/boincrs
+          tar czvf "dist/boincrs-${VERSION}-aarch64-apple-darwin.tar.gz" -C pack-aarch64 boincrs
+          tar czvf "dist/boincrs-${VERSION}-x86_64-apple-darwin.tar.gz" -C pack-x86_64 boincrs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-tarballs
+          path: dist/*.tar.gz
+
+  release:
+    needs: [build-linux, build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+      # release-plz already created the GitHub Release for this tag with
+      # notes sourced from CHANGELOG.md. softprops/action-gh-release updates
+      # that existing release in place, attaching the prebuilt binaries
+      # without touching the body.
+      - name: Attach binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            assets/**/*.tar.gz
+            assets/**/*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

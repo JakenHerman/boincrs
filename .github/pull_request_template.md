@@ -2,6 +2,18 @@
 Thanks for contributing to boincrs!
 
 Full guidance: https://jakenherman.github.io/boincrs/guide/contributing
+
+PR title / commit subject MUST be a Conventional Commit:
+  feat(scope): …     (user-visible feature → MINOR)
+  fix(scope): …      (user-visible bug fix → PATCH)
+  perf(scope): …     (user-visible perf win → PATCH)
+  feat!(scope): …    (breaking change)
+  docs: …            (docs-only, no release)
+  refactor|chore|test|ci|style|build: …   (no release)
+
+release-plz derives CHANGELOG.md and the next version from these subjects.
+Do NOT hand-edit CHANGELOG.md, Cargo.toml version, or Cargo.lock version
+rows in a feature PR — release-plz owns them.
 -->
 
 ## Summary
@@ -30,19 +42,21 @@ matching page under `docs/guide/**` in this same PR. See AGENTS.md and
       <!-- list them, e.g. `docs/guide/keyboard.md`, `docs/guide/usage.md` -->
 - [ ] No docs update needed — reason: <!-- e.g. internal refactor, test cleanup, CI-only change -->
 
-## Changelog
+## Release impact
 
 <!--
-The CI job `Changelog entry required` fails any PR that touches user-visible
-code or docs without adding a bullet under `## [Unreleased]` in CHANGELOG.md.
-
-If the change is not user-visible, tick the escape-hatch box below and also
-add the `skip-changelog` label to the PR (or include `[skip-changelog]`
-anywhere in this body).
+The commit subject / PR title IS the changelog entry. Pick the prefix that
+matches the change and write it as a one-line imperative description (no
+trailing period, no ticket IDs unless they add context).
 -->
 
-- [ ] Added a `## [Unreleased]` entry to `CHANGELOG.md`.
-- [ ] No changelog entry needed (`skip-changelog`) — reason: <!-- why -->
+- [ ] PR title / squash-merge subject uses a Conventional Commit prefix
+      (`feat`, `fix`, `perf`, `feat!`, `docs`, `refactor`, `chore`, `test`,
+      `ci`, `style`, `build`).
+- [ ] If the change is user-visible, the prefix is `feat` / `fix` / `perf`
+      / `feat!` (not `chore` / `refactor`).
+- [ ] I did not hand-edit `CHANGELOG.md`, the `version` row in `Cargo.toml`,
+      or the version rows in `Cargo.lock`.
 
 ## Verification
 

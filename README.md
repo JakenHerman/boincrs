@@ -60,10 +60,17 @@ Live-daemon and integration test variants are documented on the
 See [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [Contributing guide](https://jakenherman.github.io/boincrs/guide/contributing).
 
-## Changelog
+## Releases
 
-[`CHANGELOG.md`](CHANGELOG.md) (also mirrored on the
-[docs site](https://jakenherman.github.io/boincrs/guide/changelog)).
+Release notes live in [`CHANGELOG.md`](CHANGELOG.md). Prebuilt Linux, macOS,
+and Windows binaries are attached to each entry on the
+[Releases page](https://github.com/jakenherman/boincrs/releases).
+
+Both are generated automatically from
+[Conventional Commit](https://www.conventionalcommits.org/) messages by
+[release-plz](https://release-plz.ieni.dev/). See the
+[Changelog page](https://jakenherman.github.io/boincrs/guide/changelog) on
+the docs site for how the flow works.
 
 ## Support & security
 

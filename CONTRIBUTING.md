@@ -34,6 +34,31 @@ matching page under `docs/guide/**`. Reviewers will ask for this.
 See the [Keeping docs in sync table](https://jakenherman.github.io/boincrs/guide/contributing#keeping-docs-in-sync)
 for the full mapping of change-kind → required docs page.
 
+## Commit messages: Conventional Commits
+
+Commit subjects on `main` (and PR titles, if you squash-merge) **must** follow
+[Conventional Commits](https://www.conventionalcommits.org/). Releases are
+fully automated by [release-plz](https://release-plz.ieni.dev/) — it reads
+these subjects to decide whether to cut a release and how much to bump the
+version.
+
+| Prefix | User-visible? | Triggers release? | Bump |
+| --- | --- | --- | --- |
+| `feat:` | yes | yes | MINOR |
+| `fix:` | yes | yes | PATCH |
+| `perf:` | yes | yes | PATCH |
+| `feat!:` or `BREAKING CHANGE:` footer | yes | yes | MINOR pre-1.0, MAJOR after |
+| `docs:` | no | no | — |
+| `refactor:`, `chore:`, `test:`, `ci:`, `style:`, `build:` | no | no | — |
+
+The subject **is** the changelog entry — write it in imperative mood, one
+line, no trailing period. Examples:
+`feat(ui): show checkpoint time in selected-task header`,
+`fix(persist): sanitize colons in save filenames on Windows`.
+
+Do **not** hand-edit `CHANGELOG.md`, the `version` in `Cargo.toml`, or the
+matching row in `Cargo.lock` in a feature PR — release-plz owns those files.
+
 ## Security
 
 Do not post BOINC passwords, project account keys, or full `.env` contents in
