@@ -1,11 +1,13 @@
-use ratatui::style::{Color, Style};
+use ratatui::style::Style;
 use ratatui::text::{Line, Span};
 use ratatui::widgets::ListItem;
 
 use crate::boinc::models::{Task, TaskStatus};
+use crate::ui::theme::UiTheme;
 
 pub fn items(tasks: &[Task]) -> Vec<ListItem<'_>> {
     let mut prev_group: Option<&'static str> = None;
+    let theme = UiTheme::active();
     tasks
         .iter()
         .map(|t| {
@@ -14,7 +16,6 @@ pub fn items(tasks: &[Task]) -> Vec<ListItem<'_>> {
                 .map(|v| (v * 100.0).clamp(0.0, 100.0))
                 .map(|pct| format!("{pct:5.1}%"))
                 .unwrap_or_else(|| "  n/a".to_string());
-            let (icon, color) = status_visual(t.status);
             let name = truncate_with_ellipsis(t.name.as_str(), 36);
             let project = short_project(t.project_url.as_str());
             let group = group_heading(t.status);
@@ -23,30 +24,39 @@ pub fn items(tasks: &[Task]) -> Vec<ListItem<'_>> {
                 prev_group = Some(group);
                 spans.push(Span::styled(
                     format!("--- {group} ---\n"),
-                    Style::default().fg(Color::Blue),
+                    theme.group_heading_style(),
                 ));
             }
-            spans.extend(vec![
-                Span::raw(format!("{progress} ")),
-                Span::styled(icon, Style::default().fg(color)),
-                Span::raw(" "),
-                Span::raw(name),
-                Span::styled(
-                    format!(" [{project}]"),
-                    Style::default().fg(Color::DarkGray),
-                ),
-            ]);
+            spans.push(Span::raw(format!("{progress} ")));
+            spans.push(Span::styled(
+                status_tag(t.status),
+                theme.task_status_style(t.status),
+            ));
+            if t.active_task {
+                spans.push(Span::raw(" [active]"));
+            }
+            if t.suspended_via_gui {
+                spans.push(Span::raw(" [paused]"));
+            }
+            if let Some(code) = t.exit_status {
+                if code != 0 {
+                    spans.push(Span::raw(format!(" [exit:{code}]")));
+                }
+            }
+            spans.push(Span::raw(" "));
+            spans.push(Span::raw(name));
+            spans.push(Span::styled(format!(" ({project})"), Style::default()));
             ListItem::new(Line::from(spans))
         })
         .collect()
 }
 
-fn status_visual(status: TaskStatus) -> (&'static str, Color) {
+fn status_tag(status: TaskStatus) -> &'static str {
     match status {
-        TaskStatus::Running => ("🏃", Color::Green),
-        TaskStatus::WaitingToRun => ("⏳", Color::Yellow),
-        TaskStatus::ReadyToStart => ("🟢", Color::Cyan),
-        TaskStatus::ReadyToReport => ("📤", Color::Magenta),
+        TaskStatus::Running => "[RUN]",
+        TaskStatus::WaitingToRun => "[WAIT]",
+        TaskStatus::ReadyToStart => "[READY]",
+        TaskStatus::ReadyToReport => "[REPORT]",
     }
 }
 

@@ -30,6 +30,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   of all current state (client modes, projects, tasks, transfers) for bug reports.
 - Automatic `.env` loading: if a `.env` file exists in the working directory, boincrs
   reads it at startup and applies any keys not already set in the environment.
+- Accessibility and theming guidance in `README.md`, including keyboard-only
+  navigation, `NO_COLOR` support, and current terminal-rendering constraints.
 
 ### Fixed
 - Corrected `compute_nonce_hash` doctest expected value.
@@ -38,6 +40,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Project and transfer panes now use stateful list rendering with a `▶` highlight symbol,
   consistent with the Tasks pane.
 - Selected task detail header condensed to fit `chkpt` field alongside existing fields.
+- Core TUI state cues no longer rely on color alone: focused panes now show `[focus]`,
+  selected rows use `>>` plus reverse video, task and transfer states use text tags,
+  and confirmations can be cancelled with `Esc`.
 
 ---
 

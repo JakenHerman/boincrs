@@ -41,7 +41,8 @@ Binary: `./target/release/boincrs` (Linux/macOS) or `.\target\release\boincrs.ex
 - **Panes:** Projects | Tasks | Transfers  
 - **Header:** selected task — project, progress, status, elapsed/remaining, deadline, application, name; plus client run/network/gpu summary  
 - **Task groups:** `READY TO REPORT` → `RUNNING` (by % done) → `WAITING / READY`  
-- **Navigation:** `tab` cycles panes; `j`/`k` or arrow keys move selection in any pane  
+- **Navigation:** `tab` / `shift-tab` or `left` / `right` move pane focus; `j`/`k` or `up` / `down` move selection in the focused pane  
+- **Focus and state cues:** focused panes show `[focus]`, selected rows use `>>` plus reverse video, and task/transfer states include text labels like `[RUN]`, `[REPORT]`, `[ACTIVE]`, and `[ERROR]`
 
 ## Configuration
 
@@ -77,15 +78,30 @@ cargo run
 
 | Keys | Action |
 | --- | --- |
-| `tab` | Cycle Projects / Tasks / Transfers |
+| `tab` / `shift-tab` | Move focus forward / backward across Projects, Tasks, Transfers |
+| `left` / `right` | Move pane focus backward / forward |
 | `j` `k` / arrows | Move selection (any pane) |
 | `r` | Refresh |
 | `q` | Quit |
-| `y` / `n` | Confirm / cancel destructive actions |
+| `y` / `n` / `Esc` | Confirm / cancel destructive actions |
 | `u/s/c/w/a/x/d` | Project actions |
 | `t/g/b` | Task actions |
 | `f` | Retry transfer |
 | `1`–`9` | Run / network / GPU modes |
+
+### Accessibility and theming
+
+- The UI is designed to stay readable in dark, light, and high-contrast terminal themes by using explicit text labels in addition to semantic colors.
+- Focus is visible without color alone: the active pane title shows `[focus]`, and the selected row is marked with `>>` and reverse video.
+- Task and transfer state is not color-only: labels such as `[RUN]`, `[WAIT]`, `[REPORT]`, `[ACTIVE]`, `[IDLE]`, `[ERROR]`, `[suspended]`, and `[no-new-work]` remain visible in monochrome terminals.
+- `NO_COLOR=1 cargo run` disables color accents while keeping the text labels, reverse-video selection, and keyboard cues.
+- Keyboard-only workflow: move pane focus with `tab` / `shift-tab` or `left` / `right`, move within a pane with `j` / `k` or `up` / `down`, then use action keys or `y` / `n` / `Esc` for confirmations.
+
+Known constraints:
+
+- Terminal applications cannot reliably detect whether your emulator is currently using a light, dark, or custom high-contrast theme, so boincrs favors terminal default foreground/background colors plus explicit labels over theme-specific palettes.
+- Reverse video, bold, and underline rendering can vary slightly between terminal emulators and fonts, especially over SSH or in multiplexers like tmux.
+- boincrs currently does not expose a custom per-widget palette; accessibility/theming is driven by your terminal theme and the optional `NO_COLOR` convention.
 
 ## Testing & verification
 
@@ -109,7 +125,7 @@ BOINCRS_ASTEROIDS_ACCOUNT_KEY='…' \
   cargo test --test live_beta_projects -- --ignored --nocapture
 ```
 
-**Manual smoke:** projects and tasks populate; task groups and sorting look right; selection updates the header; safe actions work; destructive actions prompt `y/n`. See `docs/architecture/smoke-checklist.md`.
+**Manual smoke:** projects and tasks populate; task groups and sorting look right; focused pane shows `[focus]`; selected rows show `>>`; status labels remain readable with and without color; keyboard-only navigation works via `tab` / `shift-tab`, arrows, `j` / `k`, and `Esc`; safe actions work; destructive actions prompt `y/n`. See `docs/architecture/smoke-checklist.md`.
 
 ## Roadmap
 

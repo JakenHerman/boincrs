@@ -1,17 +1,22 @@
-use crossterm::event::{KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use crate::app::actions::UserAction;
 use crate::boinc::models::RunMode;
 
 pub fn map_key_to_action(key: KeyEvent) -> Option<UserAction> {
+    if key.code == KeyCode::Tab && key.modifiers.contains(KeyModifiers::SHIFT) {
+        return Some(UserAction::PreviousPane);
+    }
+
     match key.code {
         KeyCode::Char('q') => Some(UserAction::Quit),
         KeyCode::Char('r') => Some(UserAction::RefreshNow),
-        KeyCode::Tab => Some(UserAction::CyclePane),
+        KeyCode::Tab | KeyCode::Right => Some(UserAction::CyclePane),
+        KeyCode::BackTab | KeyCode::Left => Some(UserAction::PreviousPane),
         KeyCode::Char('k') | KeyCode::Up => Some(UserAction::MoveUp),
         KeyCode::Char('j') | KeyCode::Down => Some(UserAction::MoveDown),
         KeyCode::Char('y') => Some(UserAction::ConfirmPending),
-        KeyCode::Char('n') => Some(UserAction::CancelPending),
+        KeyCode::Char('n') | KeyCode::Esc => Some(UserAction::CancelPending),
         KeyCode::Char('u') => Some(UserAction::ProjectUpdate),
         KeyCode::Char('s') => Some(UserAction::ProjectSuspend),
         KeyCode::Char('c') => Some(UserAction::ProjectResume),

@@ -1,5 +1,4 @@
 use ratatui::layout::{Constraint, Direction, Layout};
-use ratatui::style::{Color, Modifier, Style};
 use ratatui::widgets::{Block, Borders, List, ListState, Paragraph};
 use ratatui::Frame;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -7,17 +6,19 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use crate::app::actions::FocusPane;
 use crate::app::state::{AppState, ConnectionState};
 use crate::boinc::models::TaskStatus;
+use crate::ui::theme::UiTheme;
 use crate::ui::widgets;
 
 pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
+    let theme = UiTheme::active();
     let root = frame.area();
     let vertical = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
             Constraint::Length(4),
             Constraint::Min(8),
-            Constraint::Length(3),
-            Constraint::Length(3),
+            Constraint::Length(4),
+            Constraint::Length(4),
         ])
         .split(root);
 
@@ -45,14 +46,29 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     };
 
     let projects = List::new(widgets::projects::items(&state.projects))
-        .block(block("Projects", state.focus == FocusPane::Projects))
-        .highlight_symbol("▶ ");
+        .block(block(
+            pane_title("Projects", state.focus == FocusPane::Projects),
+            state.focus == FocusPane::Projects,
+            theme,
+        ))
+        .highlight_symbol(">> ")
+        .highlight_style(theme.selected_item_style());
     let tasks = List::new(widgets::tasks::items(&filtered_tasks))
-        .block(block(tasks_title, state.focus == FocusPane::Tasks))
-        .highlight_symbol("▶ ");
+        .block(block(
+            pane_title(tasks_title, state.focus == FocusPane::Tasks),
+            state.focus == FocusPane::Tasks,
+            theme,
+        ))
+        .highlight_symbol(">> ")
+        .highlight_style(theme.selected_item_style());
     let transfers = List::new(widgets::transfers::items(&filtered_transfers))
-        .block(block(transfers_title, state.focus == FocusPane::Transfers))
-        .highlight_symbol("▶ ");
+        .block(block(
+            pane_title(transfers_title, state.focus == FocusPane::Transfers),
+            state.focus == FocusPane::Transfers,
+            theme,
+        ))
+        .highlight_symbol(">> ")
+        .highlight_style(theme.selected_item_style());
 
     let selected_task = Paragraph::new(selected_task_details(state)).block(
         Block::default()
@@ -79,35 +95,34 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     }
     frame.render_stateful_widget(transfers, panes[2], &mut transfer_state);
 
-    let footer = Paragraph::new(
-        "q quit | r refresh | tab pane | j/k scroll | y/n confirm | u/s/c/w/a/x/d project | t/g/b task | f transfer | A active-filter | 1-9 modes | D diag",
-    )
-    .block(Block::default().borders(Borders::ALL).title("Keymap"));
+    let footer = Paragraph::new(keymap_footer())
+        .block(Block::default().borders(Borders::ALL).title("Keymap"));
     frame.render_widget(footer, vertical[2]);
 
     let (status_text, status_style) = if let Some(pending) = &state.pending_confirmation {
         (
-            format!("PENDING CONFIRMATION: {pending} (y/n)"),
-            Style::default()
-                .fg(Color::Yellow)
-                .add_modifier(Modifier::BOLD),
+            format!("[PENDING] Confirm {pending} with y. Cancel with n or Esc."),
+            theme.warning_style(),
         )
     } else {
         match &state.conn {
-            ConnectionState::Connected => (state.status_line.clone(), Style::default()),
+            ConnectionState::Connected => (
+                format!("[STATUS] {}", state.status_line),
+                theme.info_style(),
+            ),
             ConnectionState::Retrying {
                 attempt,
                 delay_secs,
             } => (
                 format!(
-                    "[RETRYING] attempt {attempt} — reconnecting in {delay_secs}s. \
-                     Press 'r' to retry now.",
+                    "[RETRYING] attempt {attempt}; reconnecting in {delay_secs}s. \
+                     Press r to retry now.",
                 ),
-                Style::default().fg(Color::Yellow),
+                theme.warning_style(),
             ),
             ConnectionState::TerminalError(_) => (
-                format!("[ERROR] {} Press 'q' to quit.", state.status_line),
-                Style::default().fg(Color::Red).add_modifier(Modifier::BOLD),
+                format!("[ERROR] {} Press q to quit.", state.status_line),
+                theme.error_style(),
             ),
         }
     };
@@ -119,22 +134,17 @@ pub fn draw(frame: &mut Frame<'_>, state: &AppState) {
     );
 }
 
-fn block(title: &str, focused: bool) -> Block<'_> {
-    let style = if focused {
-        Style::default().fg(Color::Yellow)
-    } else {
-        Style::default()
-    };
+fn block(title: String, focused: bool, theme: UiTheme) -> Block<'static> {
     Block::default()
         .borders(Borders::ALL)
         .title(title)
-        .style(style)
+        .style(theme.pane_style(focused))
 }
 
 fn selected_task_details(state: &AppState) -> String {
     let Some(task) = state.selected_task_ref() else {
         return format!(
-            "No task selected\nclient: run:{:?} net:{:?} gpu:{:?} msgs:{}",
+            "No task selected in this view. Focus Tasks and move with j/k or Up/Down.\nclient: run:{:?} net:{:?} gpu:{:?} msgs:{}",
             state.client_state.run_mode,
             state.client_state.network_mode,
             state.client_state.gpu_mode,
@@ -231,4 +241,35 @@ fn short_project(url: &str) -> String {
         .trim_start_matches("http://")
         .trim_end_matches('/');
     trimmed.split('/').next().unwrap_or(trimmed).to_string()
+}
+
+fn pane_title(title: &str, focused: bool) -> String {
+    if focused {
+        format!("{title} [focus]")
+    } else {
+        title.to_string()
+    }
+}
+
+fn keymap_footer() -> String {
+    "Focus: Tab/Shift-Tab or Left/Right | Move: j/k or Up/Down | Selected row: >>\nActions: y/n or Esc confirm/cancel | States use labels like [RUN], [ERROR], [focus]".to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{keymap_footer, pane_title};
+
+    #[test]
+    fn focused_pane_title_has_non_color_cue() {
+        assert_eq!(pane_title("Tasks", true), "Tasks [focus]");
+        assert_eq!(pane_title("Tasks", false), "Tasks");
+    }
+
+    #[test]
+    fn keymap_footer_mentions_keyboard_only_cues() {
+        let footer = keymap_footer();
+        assert!(footer.contains("Shift-Tab"));
+        assert!(footer.contains("Selected row: >>"));
+        assert!(footer.contains("[focus]"));
+    }
 }
