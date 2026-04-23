@@ -7,7 +7,14 @@ pub fn items(transfers: &[Transfer]) -> Vec<ListItem<'_>> {
 }
 
 fn render_transfer(t: &Transfer) -> ListItem<'_> {
-    let direction = if t.is_upload { "↑" } else { "↓" };
+    let direction = if t.is_upload { "UP" } else { "DOWN" };
+    let activity = if t.error_msg.is_some() {
+        "ERROR"
+    } else if t.xfer_speed.is_some_and(|speed| speed > 0.0) {
+        "ACTIVE"
+    } else {
+        "IDLE"
+    };
     let progress = match (t.bytes_xferred, t.nbytes) {
         (Some(xferred), Some(total)) if total > 0 => {
             let pct = (xferred as f64 / total as f64 * 100.0).clamp(0.0, 100.0);
@@ -26,7 +33,7 @@ fn render_transfer(t: &Transfer) -> ListItem<'_> {
         .map(|e| format!(" [err: {e}]"))
         .unwrap_or_default();
     ListItem::new(format!(
-        "{direction} {} | {progress}{speed}{error}",
+        "[{direction}] [{activity}] {} | {progress}{speed}{error}",
         t.file_name,
     ))
 }

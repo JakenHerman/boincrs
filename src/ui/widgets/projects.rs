@@ -6,11 +6,23 @@ pub fn items(projects: &[Project]) -> Vec<ListItem<'_>> {
     projects
         .iter()
         .map(|p| {
-            let line = format!(
-                "{} ({}) [suspended:{} nmw:{}]",
-                p.name, p.url, p.suspended_via_gui, p.dont_request_more_work
-            );
+            let state = project_state_tags(p);
+            let line = format!("{} {} ({})", p.name, state, p.url);
             ListItem::new(line)
         })
         .collect()
+}
+
+fn project_state_tags(project: &Project) -> String {
+    let mut tags = Vec::new();
+    if project.suspended_via_gui {
+        tags.push("suspended");
+    }
+    if project.dont_request_more_work {
+        tags.push("no-new-work");
+    }
+    if tags.is_empty() {
+        tags.push("ready");
+    }
+    format!("[{}]", tags.join("] ["))
 }

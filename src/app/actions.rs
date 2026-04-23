@@ -18,6 +18,15 @@ impl FocusPane {
             Self::Transfers => Self::Projects,
         }
     }
+
+    /// Cycles focus in reverse order for keyboard users.
+    pub fn previous(self) -> Self {
+        match self {
+            Self::Projects => Self::Transfers,
+            Self::Tasks => Self::Projects,
+            Self::Transfers => Self::Tasks,
+        }
+    }
 }
 
 /// User-triggered actions from keyboard input.
@@ -25,6 +34,7 @@ impl FocusPane {
 pub enum UserAction {
     RefreshNow,
     CyclePane,
+    PreviousPane,
     MoveUp,
     MoveDown,
     Quit,

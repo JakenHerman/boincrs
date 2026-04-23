@@ -186,6 +186,9 @@ impl AppController {
             UserAction::CyclePane => {
                 self.state.focus = self.state.focus.next();
             }
+            UserAction::PreviousPane => {
+                self.state.focus = self.state.focus.previous();
+            }
             UserAction::MoveUp => self.navigate_selection(true),
             UserAction::MoveDown => self.navigate_selection(false),
             UserAction::SaveDiagnostics => self.save_diagnostics(),
@@ -281,6 +284,7 @@ impl AppController {
             | UserAction::CancelPending
             | UserAction::RefreshNow
             | UserAction::CyclePane
+            | UserAction::PreviousPane
             | UserAction::MoveUp
             | UserAction::MoveDown
             | UserAction::SaveDiagnostics
