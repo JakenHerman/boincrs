@@ -10,6 +10,32 @@ Conventional Commit messages. Do not hand-edit.
 
 <!-- history below is preserved from the hand-maintained changelog; release-plz appends above -->
 
+## [0.2.0](https://github.com/JakenHerman/boincrs/releases/tag/v0.2.0) - 2026-04-23
+
+### Other
+
+- bump version to 0.2.0 for release-plz baseline
+- automate releases with release-plz
+- Merge main into jaken/docs
+- enforce changelog updates and wire docs site into repo scaffolding
+- add Docusaurus site, changelog enforcement, and TUI landing fix
+- add BOINC compatibility matrix and validation gates
+- Improve TUI accessibility and theme resilience
+- ran cargo fmt
+- Add active-only filter to toggle visibility to "Running" tasks
+- Filter Tasks and Transfers panes by selected project
+- Fix clippy: derive Default on ConnectionState instead of manual impl
+- Update CHANGELOG for reconnect backoff and error classification
+- Track Cargo.lock for reproducible binary builds
+- Add reconnect backoff, connection state, and actionable error UI
+- Apply cargo fmt to remaining files missed in previous pass
+- Add CI workflow and fix pre-existing test failures
+- Add AGENTS.md contributor guidance
+- Complete Next milestone: task metadata, diagnostics bundle, .env loading
+- Add full pane selection and richer transfer visibility
+- Add CHANGELOG
+- Initial commit
+
 ## [0.1.0-beta] - 2026-04-20
 
 ### Added
