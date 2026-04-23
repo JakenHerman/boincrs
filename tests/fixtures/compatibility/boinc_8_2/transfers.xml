@@ -1,0 +1,10 @@
+<boinc_gui_rpc_reply>
+  <file_transfer>
+    <project_url>https://modern.example/boinc/</project_url>
+    <name>modern_download.dat</name>
+    <status>downloading</status>
+    <nbytes>16384</nbytes>
+    <bytes_xferred>8192</bytes_xferred>
+    <xfer_speed>2048</xfer_speed>
+  </file_transfer>
+</boinc_gui_rpc_reply>

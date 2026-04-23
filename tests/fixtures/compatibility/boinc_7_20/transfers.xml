@@ -1,0 +1,12 @@
+<boinc_gui_rpc_reply>
+  <file_transfer>
+    <project_url>https://mid.example/boinc/</project_url>
+    <name>mid_upload.zip</name>
+    <status>active</status>
+    <nbytes>8192</nbytes>
+    <bytes_xferred>4096</bytes_xferred>
+    <xfer_speed>1280</xfer_speed>
+    <is_upload>1</is_upload>
+    <error_msg>temporary http 500</error_msg>
+  </file_transfer>
+</boinc_gui_rpc_reply>

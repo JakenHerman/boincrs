@@ -1,0 +1,22 @@
+<boinc_gui_rpc_reply>
+  <result>
+    <project_url>https://legacy.example/boinc/</project_url>
+    <name>legacy_active</name>
+    <active_task_state>1</active_task_state>
+    <scheduler_state>1</scheduler_state>
+    <fraction_done>0.42</fraction_done>
+    <elapsed_time>1200</elapsed_time>
+    <estimated_cpu_time_remaining>800</estimated_cpu_time_remaining>
+    <report_deadline>1710000000</report_deadline>
+    <resources>legacy_intelx86</resources>
+    <checkpoint_cpu_time>600</checkpoint_cpu_time>
+    <received_time>1700000000</received_time>
+  </result>
+  <result>
+    <project_url>https://legacy.example/boinc/</project_url>
+    <name>legacy_report</name>
+    <ready_to_report></ready_to_report>
+    <app_version_num>701600</app_version_num>
+    <exit_status>193</exit_status>
+  </result>
+</boinc_gui_rpc_reply>

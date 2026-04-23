@@ -1,0 +1,12 @@
+<boinc_gui_rpc_reply>
+  <file_transfer>
+    <project_url>https://legacy.example/boinc/</project_url>
+    <name>legacy_upload.zip</name>
+    <status>upload_pending</status>
+    <nbytes>4096</nbytes>
+    <last_bytes_xferred>2048</last_bytes_xferred>
+    <xfer_speed>512</xfer_speed>
+    <generated_locally>1</generated_locally>
+    <error>temporary dns failure</error>
+  </file_transfer>
+</boinc_gui_rpc_reply>

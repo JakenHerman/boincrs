@@ -1,0 +1,18 @@
+<boinc_gui_rpc_reply>
+  <result>
+    <project_url>https://mid.example/boinc/</project_url>
+    <name>mid_running</name>
+    <active_task>1</active_task>
+    <fraction_done>0.33</fraction_done>
+    <elapsed_time>900</elapsed_time>
+    <estimated_cpu_time_remaining>1800</estimated_cpu_time_remaining>
+    <plan_class>opencl_nvidia</plan_class>
+  </result>
+  <result>
+    <project_url>https://mid.example/boinc/</project_url>
+    <name>mid_waiting</name>
+    <scheduler_state>waiting to run</scheduler_state>
+    <plan_class>cuda102</plan_class>
+    <fraction_done>0.05</fraction_done>
+  </result>
+</boinc_gui_rpc_reply>

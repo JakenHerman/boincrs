@@ -47,6 +47,7 @@ Thanks for helping improve `boincrs`.
 - Unit and integration:
   ```bash
   cargo test
+  cargo test --test compatibility_matrix_tests
   ```
 - Local BOINC daemon integration:
   ```bash
@@ -60,6 +61,10 @@ Thanks for helping improve `boincrs`.
   BOINCRS_ASTEROIDS_ACCOUNT_KEY='YOUR_ASTEROIDS_KEY' \
   cargo test --test live_beta_projects -- --ignored --nocapture
   ```
+
+If you touch BOINC protocol parsing, auth, transport, or refresh/controller behavior,
+refresh the compatibility fixtures under `tests/fixtures/compatibility/` and update
+`docs/compatibility-matrix.md` when support expectations change.
 
 ## Reporting bugs
 
