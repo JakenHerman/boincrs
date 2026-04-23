@@ -1,27 +1,21 @@
 # Support boincrs
 
-If `boincrs` is useful to you and you want to support ongoing development, thank you.
+Full support information lives on the docs site:
 
-## Financial support options
+**➡ [jakenherman.github.io/boincrs/guide/support](https://jakenherman.github.io/boincrs/guide/support)**
 
-This project currently supports direct funding through maintainer-managed channels.
+## Financial support
 
-- GitHub Sponsors: https://github.com/sponsors/JakenHerman
-- BuyMeACoffee: https://buymeacoffee.com/jakenherman
+- [GitHub Sponsors](https://github.com/sponsors/JakenHerman)
+- [Buy Me a Coffee](https://buymeacoffee.com/jakenherman)
 
-## Other ways to help
+## Reporting bugs
 
-- Report bugs with reproducible steps.
-- Contribute docs and onboarding improvements.
-- Submit UI/UX improvements for terminal readability.
-- Help test on Linux, macOS, and Windows.
-- Share `boincrs` with BOINC/open science communities.
+See [Reporting bugs](https://jakenherman.github.io/boincrs/guide/contributing#reporting-bugs).
+Include OS, terminal emulator, BOINC version, reproduction steps, and a
+scrubbed diagnostics bundle (press `D` in the TUI) if relevant.
 
-## Transparency
+## Security
 
-Funding priorities:
-
-1. Stability and bug fixes
-2. Cross-platform packaging and release automation
-3. Documentation and onboarding
-4. Feature development and long-term maintenance
+Do not post BOINC passwords, project account keys, or full `.env` contents in
+public issues.
