@@ -110,7 +110,9 @@ Commit subjects on `main` (and PR titles, if the PR is squash-merged) **must**
 follow [Conventional Commits](https://www.conventionalcommits.org/). Releases
 are fully automated by [release-plz](https://release-plz.ieni.dev/), which
 reads commit subjects to decide whether to cut a release and how much to
-bump the version.
+bump the version. PR titles are checked automatically by the `PR title`
+workflow (`.github/workflows/pr-title.yml`); a non-conforming title blocks
+merge.
 
 | Prefix | User-visible? | Triggers release? | Bump |
 | --- | --- | --- | --- |

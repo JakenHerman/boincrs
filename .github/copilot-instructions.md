@@ -129,7 +129,9 @@ Every commit that lands on `main` — directly, or as the squash-merge subject
 of a PR — **must** use a
 [Conventional Commit](https://www.conventionalcommits.org/) subject.
 release-plz reads these commits to decide whether a new release is due and
-how much to bump the version.
+how much to bump the version. PR titles are checked automatically by
+`.github/workflows/pr-title.yml`; Copilot should set the PR title to a
+valid Conventional Commit from the start to avoid a failing check.
 
 | Subject prefix | User-visible? | Triggers release? | Bump |
 | --- | --- | --- | --- |

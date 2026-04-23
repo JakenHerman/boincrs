@@ -1,0 +1,52 @@
+name: PR title
+
+# Enforces Conventional Commits on pull-request titles.
+#
+# When a PR is squash-merged (the common case), its title becomes the commit
+# subject on `main`. release-plz reads those subjects to decide whether to
+# cut a release and what kind of version bump to apply, so a non-conventional
+# title would silently skip releases or mis-classify the bump.
+#
+# This job fails the PR until the title matches one of the prefixes listed
+# in AGENTS.md / .github/copilot-instructions.md / CONTRIBUTING.md.
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    name: Conventional Commit title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Keep this list in sync with the tables in AGENTS.md,
+          # .github/copilot-instructions.md, and CONTRIBUTING.md.
+          types: |
+            feat
+            fix
+            perf
+            docs
+            refactor
+            chore
+            test
+            ci
+            style
+            build
+          requireScope: false
+          subjectPattern: ^[^A-Z].+[^.]$
+          subjectPatternError: |
+            The PR title subject ("{subject}") must start with a lowercase
+            letter and must not end with a period. The subject becomes the
+            changelog entry verbatim — write it in imperative mood, e.g.
+            "feat(ui): show checkpoint time in selected-task header".

@@ -173,7 +173,9 @@ Every commit that lands on `main` (directly or via squash-merge, whichever
 the PR uses) **must** use a
 [Conventional Commit](https://www.conventionalcommits.org/) subject. This is
 how release-plz knows a release is needed and what kind of version bump to
-cut.
+cut. PR titles are checked automatically by
+`.github/workflows/pr-title.yml` — a PR with a non-conforming title cannot
+be merged.
 
 | Subject prefix | User-visible? | Triggers release? | Bump |
 | --- | --- | --- | --- |
