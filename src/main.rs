@@ -13,8 +13,26 @@ async fn main() -> AppResult<()> {
 
     let transport = TcpBoincTransport::connect(endpoint.clone()).await?;
     let mut rpc_client = BoincRpcClient::new(Box::new(transport), password.clone());
-    let _ = attach_projects_from_env(&mut rpc_client).await?;
+    let bootstrap_report = attach_projects_from_env(&mut rpc_client).await?;
     let mut controller = AppController::new(rpc_client, endpoint, password);
+    if !bootstrap_report.attached.is_empty() || bootstrap_report.profile_name.is_some() {
+        let profile_part = bootstrap_report
+            .profile_name
+            .as_deref()
+            .map(|n| format!(" profile:{n}"))
+            .unwrap_or_default();
+        let skipped_part = if bootstrap_report.skipped.is_empty() {
+            String::new()
+        } else {
+            format!(" skipped:{}", bootstrap_report.skipped.len())
+        };
+        controller.state.status_line = format!(
+            "Bootstrap: attached {}{}{}",
+            bootstrap_report.attached.len(),
+            profile_part,
+            skipped_part,
+        );
+    }
     controller.run().await
 }
 
