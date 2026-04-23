@@ -25,6 +25,15 @@ Binary: `./target/release/boincrs` (Linux/macOS) or `.\target\release\boincrs.ex
 **Linux:** install Rust and BOINC, then build as above.  
 **macOS / Windows:** install Rust and [BOINC](https://boinc.berkeley.edu/download.php), then the same clone/build steps.
 
+## Compatibility
+
+`boincrs` actively validates BOINC `7.16.x`, `7.20.x`, and `8.2.x`.
+See `docs/compatibility-matrix.md` for the supported BOINC/host OS matrix,
+automation coverage, manual validation steps, and known quirks.
+
+Maintainers should use `docs/release-checklist.md` before tagging a release; it
+includes the compatibility sign-off gate.
+
 ## Learn more
 
 | Topic | Link |
@@ -107,6 +116,7 @@ Known constraints:
 
 ```bash
 cargo test
+cargo test --test compatibility_matrix_tests
 ```
 
 **Against a live local BOINC daemon** (ignored tests — needs GUI RPC password):
@@ -156,4 +166,6 @@ Do not commit real `.env` values. Treat GUI RPC password and project authenticat
 - `docs/architecture/app-controller.md`
 - `docs/architecture/smoke-checklist.md`
 - `docs/architecture/beta-primegrid-asteroids.md`
+- `docs/compatibility-matrix.md`
+- `docs/release-checklist.md`
 - `docs/decisions/0001-error-handling.md`

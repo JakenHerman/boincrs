@@ -1,0 +1,11 @@
+<boinc_gui_rpc_reply>
+  <network_mode>
+    <mode>1</mode>
+  </network_mode>
+  <task_mode>
+    <mode>2</mode>
+  </task_mode>
+  <gpu_mode>
+    <mode>3</mode>
+  </gpu_mode>
+</boinc_gui_rpc_reply>

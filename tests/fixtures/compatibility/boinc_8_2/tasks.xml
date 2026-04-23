@@ -1,0 +1,20 @@
+<boinc_gui_rpc_reply>
+  <result>
+    <project_url>https://modern.example/boinc/</project_url>
+    <name>modern_running</name>
+    <active_task>1</active_task>
+    <fraction_done>0.87</fraction_done>
+    <elapsed_time>7200</elapsed_time>
+    <estimated_cpu_time_remaining>900</estimated_cpu_time_remaining>
+    <report_deadline>1720000000</report_deadline>
+    <resources>vbox64_mt</resources>
+    <checkpoint_cpu_time>7100</checkpoint_cpu_time>
+    <received_time>1710000000</received_time>
+  </result>
+  <result>
+    <project_url>https://modern.example/boinc/</project_url>
+    <name>modern_waiting</name>
+    <scheduler_state>preempted</scheduler_state>
+    <app_version_num>80209</app_version_num>
+  </result>
+</boinc_gui_rpc_reply>

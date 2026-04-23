@@ -1,0 +1,8 @@
+<boinc_gui_rpc_reply>
+  <project>
+    <master_url>https://mid.example/boinc/</master_url>
+    <project_name>Bridge Science</project_name>
+    <suspended_via_gui>1</suspended_via_gui>
+    <dont_request_more_work>0</dont_request_more_work>
+  </project>
+</boinc_gui_rpc_reply>

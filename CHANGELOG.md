@@ -32,6 +32,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   reads it at startup and applies any keys not already set in the environment.
 - Accessibility and theming guidance in `README.md`, including keyboard-only
   navigation, `NO_COLOR` support, and current terminal-rendering constraints.
+- BOINC compatibility matrix documentation covering supported `7.16.x`, `7.20.x`,
+  and `8.2.x` validation targets, host OS guidance, and known quirks.
+- Release checklist with a compatibility sign-off gate for tagged releases.
+- Fixture-backed compatibility tests for BOINC `7.16`, `7.20`, and `8.2` parser
+  variants, plus dedicated GitHub Actions jobs for each supported target.
 
 ### Fixed
 - Corrected `compute_nonce_hash` doctest expected value.

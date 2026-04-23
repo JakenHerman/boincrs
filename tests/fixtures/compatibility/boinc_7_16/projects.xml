@@ -1,0 +1,8 @@
+<boinc_gui_rpc_reply>
+  <project>
+    <master_url>https://legacy.example/boinc/</master_url>
+    <project_name>Legacy Science</project_name>
+    <suspended_via_gui>0</suspended_via_gui>
+    <dont_request_more_work>1</dont_request_more_work>
+  </project>
+</boinc_gui_rpc_reply>

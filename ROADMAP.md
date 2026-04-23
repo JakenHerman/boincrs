@@ -18,6 +18,7 @@
 - ~~Improved project/task selection for all panes~~ ✓
 - ~~Exportable diagnostics bundle for bug reports~~ ✓
 - ~~Optional `.env` auto-loading without shell `source`~~ ✓
+- ~~BOINC compatibility matrix and validation gates~~ ✓
 
 ## Release Candidate
 
@@ -26,7 +27,6 @@
   - macOS signed/universal binaries
   - Windows executable + installer path
 - Backoff/reconnect and stronger error surfacing
-- Wider BOINC version compatibility validation
 - User-facing command docs and screenshots
 
 ## 1.0
