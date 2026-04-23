@@ -11,6 +11,7 @@ account keys are supported.
 - [Why boincrs?](https://jakenherman.github.io/boincrs/guide/why-boincrs)
 - [Getting started](https://jakenherman.github.io/boincrs/guide/getting-started)
 - [Configuration](https://jakenherman.github.io/boincrs/guide/configuration)
+- [Project templates & profiles](https://jakenherman.github.io/boincrs/guide/architecture/project-templates-and-profiles)
 - [Keyboard reference](https://jakenherman.github.io/boincrs/guide/keyboard)
 - [Compatibility matrix](https://jakenherman.github.io/boincrs/guide/compatibility)
 

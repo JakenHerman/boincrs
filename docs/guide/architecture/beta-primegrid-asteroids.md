@@ -16,6 +16,11 @@ through environment variables.
 - `BOINCRS_ASTEROIDS_ACCOUNT_KEY` — Asteroids@home account key
 - `BOINCRS_ATTACH_PROJECTS` — optional custom list of the form
   `https://example.com/boinc/|account_key;https://example2.com/|account_key2`
+- `BOINCRS_ATTACH_TEMPLATES` — curated-slug list of the form
+  `primegrid|KEY1;rosetta|KEY2`
+  (see [Project templates & profiles](./project-templates-and-profiles.md))
+- `BOINCRS_PROFILE_FILE` — path to a preset profile bundling attach entries
+  and run / network / GPU mode overrides
 
 When any of these are provided, startup performs:
 

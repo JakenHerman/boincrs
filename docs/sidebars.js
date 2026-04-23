@@ -20,6 +20,7 @@ const sidebars = {
       items: [
         'architecture/app-controller',
         'architecture/beta-primegrid-asteroids',
+        'architecture/project-templates-and-profiles',
         'architecture/smoke-checklist',
       ],
     },
