@@ -1,81 +1,40 @@
 # Contributing to boincrs
 
-Thanks for helping improve `boincrs`.
+Thanks for helping improve `boincrs`. The full, up-to-date contributing guide
+lives on the docs site:
 
-## Development setup
+**➡ [jakenherman.github.io/boincrs/guide/contributing](https://jakenherman.github.io/boincrs/guide/contributing)**
 
-1. Install Rust via [rustup](https://rustup.rs/).
-2. Clone the repository:
-   ```bash
-   git clone https://www.github.com/jakenherman/boincrs.git
-   cd boincrs
-   ```
-3. Copy environment template:
-   ```bash
-   cp .env.example .env
-   ```
-4. Edit `.env` with your local BOINC settings.
-5. Build and test:
-   ```bash
-   cargo test
-   cargo run
-   ```
+The short version is below; always defer to the docs site if the two disagree.
 
-## Contribution flow
+## Quick start
 
-1. Create a feature branch.
-2. Make focused changes with clear commit messages.
-3. Ensure tests pass:
-   ```bash
-   cargo test
-   ```
-4. Update docs if behavior changed (`README.md` and relevant docs under `docs/`).
-5. Open a pull request with:
-   - change summary
-   - test notes
-   - screenshots/GIFs for UI changes
+```bash
+git clone https://github.com/jakenherman/boincrs.git
+cd boincrs
+cp .env.example .env           # edit with your local BOINC settings
+cargo test
+cargo run
+```
 
-## Code guidelines
+## Gate before opening a PR
 
-- Keep production code free of `.unwrap()`/`.expect()` (tests may use them).
-- Prefer typed errors (`thiserror`) and explicit handling.
-- Favor reusable module boundaries over UI-specific coupling.
-- Keep terminal rendering stable for narrow widths where practical.
+```bash
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test
+```
 
-## Testing guidance
+## Docs are part of the change
 
-- Unit and integration:
-  ```bash
-  cargo test
-  cargo test --test compatibility_matrix_tests
-  ```
-- Local BOINC daemon integration:
-  ```bash
-  BOINCRS_PASSWORD_FILE=/etc/boinc-client/gui_rpc_auth.cfg \
-  cargo test --test live_local_boinc -- --ignored --nocapture
-  ```
-- PrimeGrid + Asteroids beta attach test:
-  ```bash
-  BOINCRS_PASSWORD_FILE=/etc/boinc-client/gui_rpc_auth.cfg \
-  BOINCRS_PRIMEGRID_ACCOUNT_KEY='YOUR_PRIMEGRID_KEY' \
-  BOINCRS_ASTEROIDS_ACCOUNT_KEY='YOUR_ASTEROIDS_KEY' \
-  cargo test --test live_beta_projects -- --ignored --nocapture
-  ```
+If a PR changes user-visible behavior — keybindings, env vars, UI labels,
+BOINC RPC surface, error handling, release flow — it **must** update the
+matching page under `docs/guide/**`. Reviewers will ask for this.
 
-If you touch BOINC protocol parsing, auth, transport, or refresh/controller behavior,
-refresh the compatibility fixtures under `tests/fixtures/compatibility/` and update
-`docs/compatibility-matrix.md` when support expectations change.
-
-## Reporting bugs
-
-Please include:
-- OS + terminal emulator
-- `boincrs` version/commit
-- steps to reproduce
-- expected vs actual behavior
-- relevant screenshot(s)
-- sanitized logs/output
+See the [Keeping docs in sync table](https://jakenherman.github.io/boincrs/guide/contributing#keeping-docs-in-sync)
+for the full mapping of change-kind → required docs page.
 
 ## Security
 
-Do not post BOINC passwords, project account keys, or full `.env` contents in issues/PRs.
+Do not post BOINC passwords, project account keys, or full `.env` contents in
+issues or PRs.

@@ -68,6 +68,23 @@ jobs:
       - name: Tests
         run: cargo test --locked
 
+  changelog:
+    name: Changelog entry required
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enforce CHANGELOG.md entry for user-visible changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: bash .github/scripts/check-changelog.sh
+
   compatibility-matrix:
     name: BOINC compatibility (${{ matrix.boinc_target }})
     runs-on: ubuntu-latest

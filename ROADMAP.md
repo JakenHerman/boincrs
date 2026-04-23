@@ -1,37 +1,19 @@
-# boincrs Roadmap
+# boincrs roadmap
 
-## Beta (current)
+The living roadmap lives on the docs site:
 
-- Local BOINC RPC connectivity and authentication
-- PrimeGrid + Asteroids@home attach flow via account keys
-- Projects / Tasks / Transfers panes
-- Selected task details header
-- Task grouping and ordering:
-  - ready-to-report
-  - running (by completion)
-  - waiting / ready
+**➡ [jakenherman.github.io/boincrs/guide/roadmap](https://jakenherman.github.io/boincrs/guide/roadmap)**
 
-## Next
+The current headline milestones:
 
-- ~~Better task metadata coverage (more BOINC result fields)~~ ✓
-- ~~Better transfer visibility (retry/error reasons and throughput)~~ ✓
-- ~~Improved project/task selection for all panes~~ ✓
-- ~~Exportable diagnostics bundle for bug reports~~ ✓
-- ~~Optional `.env` auto-loading without shell `source`~~ ✓
-- ~~BOINC compatibility matrix and validation gates~~ ✓
+- **Beta (current):** local BOINC RPC, Projects / Tasks / Transfers panes,
+  PrimeGrid + Asteroids@home auto-attach, grouped task ordering.
+- **Next:** packaging, richer task/transfer metadata, diagnostics bundle
+  (done), `.env` auto-loading (done), compatibility matrix (done).
+- **Release candidate:** cross-platform packaging, reconnect hardening,
+  screenshots and command docs on the docs site.
+- **1.0:** stable release process, broader project templates, optional remote
+  RPC profile support, improved accessibility.
 
-## Release Candidate
-
-- Packaging:
-  - Linux package artifacts
-  - macOS signed/universal binaries
-  - Windows executable + installer path
-- Backoff/reconnect and stronger error surfacing
-- User-facing command docs and screenshots
-
-## 1.0
-
-- Stable release process and changelog policy
-- Broader project attach templates and preset profiles
-- Optional remote RPC profile support
-- Improved accessibility and terminal theme behavior
+See the docs site for the full, up-to-date list with strike-throughs on
+completed work.

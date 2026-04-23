@@ -1,3 +1,10 @@
+---
+id: project-templates-and-profiles
+title: Project templates & profiles
+sidebar_position: 4
+description: Curated BOINC project registry plus a preset profile format for repeatable onboarding.
+---
+
 # Project attach templates and preset profiles
 
 `boincrs` ships with two cooperating onboarding primitives:

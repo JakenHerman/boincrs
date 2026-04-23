@@ -24,3 +24,9 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Docs site (Docusaurus) build artifacts
+docs/node_modules/
+docs/build/
+docs/.docusaurus/
+docs/.cache-loader/
