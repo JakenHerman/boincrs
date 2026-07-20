@@ -1,12 +1,19 @@
 name: Release
 
-# Tag-triggered binary builds.
+# Tag-triggered binary builds and package publishing.
 #
 # The GitHub Release itself is created by release-plz when the "chore: release"
 # PR is merged (see release-plz.yml and release-plz.toml). This workflow runs
-# on the resulting `v*` tag push and ONLY attaches prebuilt Linux, macOS, and
-# Windows binaries to that existing release. It does not generate release
-# notes — those come from CHANGELOG.md via release-plz.
+# on the resulting `v*` tag push and:
+#
+#   1. builds prebuilt Linux, macOS, and Windows binaries,
+#   2. attaches them plus a checksums.txt to that existing release,
+#   3. regenerates the Homebrew formula (Formula/boincrs.rb) and commits it,
+#   4. builds the Chocolatey package, attaches the .nupkg, and — when a
+#      CHOCO_API_KEY secret is configured — pushes it to the community feed.
+#
+# It does not generate release notes; those come from CHANGELOG.md via
+# release-plz.
 
 on:
   push:
@@ -82,6 +89,8 @@ jobs:
           name: macos-tarballs
           path: dist/*.tar.gz
 
+  # Aggregate all build artifacts, publish SHA256 checksums, and attach
+  # everything to the release release-plz already created for this tag.
   release:
     needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
@@ -89,15 +98,101 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: assets
-      # release-plz already created the GitHub Release for this tag with
-      # notes sourced from CHANGELOG.md. softprops/action-gh-release updates
-      # that existing release in place, attaching the prebuilt binaries
-      # without touching the body.
-      - name: Attach binaries to GitHub Release
+      - name: Collect artifacts and generate checksums
+        run: |
+          mkdir -p dist
+          find assets -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec cp {} dist/ \;
+          cd dist
+          sha256sum * > checksums.txt
+          echo "## Published artifacts and SHA256 checksums"
+          cat checksums.txt
+      # release-plz already created the GitHub Release for this tag with notes
+      # sourced from CHANGELOG.md. softprops/action-gh-release updates that
+      # existing release in place, attaching the prebuilt binaries and the
+      # checksums file without touching the body.
+      - name: Attach binaries and checksums to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            assets/**/*.tar.gz
-            assets/**/*.zip
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Regenerate Formula/boincrs.rb from the freshly built tarballs and commit it
+  # to main, so this repository works as a Homebrew tap:
+  #   brew tap jakenherman/boincrs https://github.com/jakenherman/boincrs
+  #   brew install boincrs
+  homebrew:
+    needs: [release]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+      - name: Render Homebrew formula
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          find assets -type f -name '*.tar.gz' -exec cp {} . \;
+          sha_linux=$(sha256sum "boincrs-${VERSION}-x86_64-unknown-linux-gnu.tar.gz" | cut -d' ' -f1)
+          sha_arm=$(sha256sum "boincrs-${VERSION}-aarch64-apple-darwin.tar.gz" | cut -d' ' -f1)
+          sha_intel=$(sha256sum "boincrs-${VERSION}-x86_64-apple-darwin.tar.gz" | cut -d' ' -f1)
+          mkdir -p Formula
+          VERSION="$VERSION" SHA_LINUX="$sha_linux" SHA_ARM="$sha_arm" SHA_INTEL="$sha_intel" \
+            bash packaging/homebrew/render.sh > Formula/boincrs.rb
+          echo "Rendered formula:"
+          cat Formula/boincrs.rb
+      - name: Commit updated formula
+        run: |
+          if git diff --quiet -- Formula/boincrs.rb; then
+            echo "Formula already up to date; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Formula/boincrs.rb
+          git commit -m "chore(release): update Homebrew formula for ${GITHUB_REF_NAME} [skip ci]"
+          git push origin HEAD:main
+
+  # Build the Chocolatey package, attach the .nupkg to the release, and push it
+  # to the community feed when CHOCO_API_KEY is configured.
+  chocolatey:
+    needs: [release]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+      - name: Build and publish Chocolatey package
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          $zip = Get-ChildItem -Recurse assets -Filter "boincrs-$version-x86_64-pc-windows-msvc.zip" | Select-Object -First 1
+          if (-not $zip) { throw "Windows zip artifact not found for version $version" }
+          $hash = (Get-FileHash $zip.FullName -Algorithm SHA256).Hash.ToLower()
+          Write-Host "Windows zip sha256: $hash"
+
+          & packaging/chocolatey/build.ps1 -Version $version -Sha256 $hash
+          if ($LASTEXITCODE -ne 0) { throw "build.ps1 failed with exit code $LASTEXITCODE" }
+
+          $nupkg = Get-ChildItem packaging/chocolatey/out -Filter '*.nupkg' | Select-Object -First 1
+          if (-not $nupkg) { throw "No .nupkg produced" }
+
+          gh release upload $env:GITHUB_REF_NAME $nupkg.FullName --clobber
+
+          if ($env:CHOCO_API_KEY) {
+            choco push $nupkg.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCO_API_KEY
+          } else {
+            Write-Host "CHOCO_API_KEY secret not set; skipping push to the Chocolatey community feed. The .nupkg is attached to the release."
+          }

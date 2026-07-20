@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Chocolatey package manifest for boincrs.
+
+  This is a TEMPLATE: the {{VERSION}} token is substituted by
+  packaging/chocolatey/build.ps1 (invoked from .github/workflows/release.yml)
+  before `choco pack` runs. Do not run `choco pack` against this file directly.
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>boincrs</id>
+    <version>{{VERSION}}</version>
+    <packageSourceUrl>https://github.com/jakenherman/boincrs/tree/main/packaging/chocolatey</packageSourceUrl>
+    <owners>jakenherman</owners>
+    <title>boincrs</title>
+    <authors>Jaken Herman</authors>
+    <projectUrl>https://github.com/jakenherman/boincrs</projectUrl>
+    <projectSourceUrl>https://github.com/jakenherman/boincrs</projectSourceUrl>
+    <docsUrl>https://jakenherman.github.io/boincrs</docsUrl>
+    <bugTrackerUrl>https://github.com/jakenherman/boincrs/issues</bugTrackerUrl>
+    <licenseUrl>https://github.com/jakenherman/boincrs/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <iconUrl>https://raw.githubusercontent.com/jakenherman/boincrs/main/docs/static/img/logo.svg</iconUrl>
+    <tags>boinc rust tui terminal cli distributed-computing volunteer-computing foss cross-platform</tags>
+    <summary>A fast, keyboard-first terminal UI for a local BOINC client.</summary>
+    <description>
+boincrs is a fast, keyboard-first terminal UI (TUI) for controlling a local
+[BOINC](https://boinc.berkeley.edu/) client over the GUI RPC interface.
+
+Features:
+
+* Projects, Tasks, and Transfers panes with grouped task ordering.
+* Auto-attach to PrimeGrid and Asteroids@home via account keys.
+* Reconnect hardening and a diagnostics bundle.
+* Configuration via environment variables or an optional `.env` file.
+
+## Requirements
+
+A BOINC client must be running locally with the GUI RPC interface enabled. The
+GUI RPC password is read from `BOINCRS_PASSWORD` or `BOINCRS_PASSWORD_FILE`.
+
+See the full guide at https://jakenherman.github.io/boincrs.
+    </description>
+    <releaseNotes>https://github.com/jakenherman/boincrs/releases/tag/v{{VERSION}}</releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

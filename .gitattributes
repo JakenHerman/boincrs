@@ -1,0 +1,9 @@
+# Normalize line endings automatically.
+* text=auto
+
+# Shell scripts must stay LF so they run on Linux/macOS CI and via the
+# `#!/usr/bin/env bash` shebang regardless of the committer's platform.
+*.sh text eol=lf
+
+# PowerShell packaging scripts stay CRLF for Windows tooling.
+*.ps1 text eol=crlf

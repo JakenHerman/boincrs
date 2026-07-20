@@ -15,7 +15,28 @@ account keys are supported.
 - [Keyboard reference](https://jakenherman.github.io/boincrs/guide/keyboard)
 - [Compatibility matrix](https://jakenherman.github.io/boincrs/guide/compatibility)
 
-## Quick install (from source)
+## Install
+
+### Homebrew (macOS / Linux)
+
+```bash
+brew tap jakenherman/boincrs https://github.com/jakenherman/boincrs
+brew install boincrs
+```
+
+### Chocolatey (Windows)
+
+```powershell
+choco install boincrs
+```
+
+### Prebuilt binaries
+
+Download the tarball/zip for your platform from the
+[Releases page](https://github.com/jakenherman/boincrs/releases) and verify it
+against the release's `checksums.txt`.
+
+### From source
 
 ```bash
 git clone https://github.com/jakenherman/boincrs.git

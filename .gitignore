@@ -30,3 +30,7 @@ docs/node_modules/
 docs/build/
 docs/.docusaurus/
 docs/.cache-loader/
+
+# Rendered packaging output
+packaging/chocolatey/out/
+*.nupkg

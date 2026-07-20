@@ -7,17 +7,59 @@ description: Install boincrs from source on Linux, macOS, or Windows.
 
 # Installation
 
-`boincrs` is currently distributed as a **source build**. Binary releases and
-packaged installers are tracked on the [roadmap](./roadmap.md).
+`boincrs` ships as **package-manager installs**, **prebuilt binaries**, and a
+**source build**. Pick whichever fits your platform.
 
-## Prerequisites
+## Homebrew (macOS / Linux)
+
+```bash
+brew tap jakenherman/boincrs https://github.com/jakenherman/boincrs
+brew install boincrs
+```
+
+Upgrade later with `brew upgrade boincrs`. The formula installs the prebuilt
+binary for your architecture (Apple Silicon, Intel macOS, or x86-64 Linux) and
+verifies it against the release checksum.
+
+## Chocolatey (Windows)
+
+```powershell
+choco install boincrs
+```
+
+Upgrade later with `choco upgrade boincrs`. The package downloads the Windows
+release zip, verifies its SHA256, and puts `boincrs` on your `PATH`.
+
+## Prebuilt binaries
+
+Every [GitHub Release](https://github.com/jakenherman/boincrs/releases) attaches
+a tarball (Linux/macOS) or zip (Windows) plus a `checksums.txt`. Download the
+asset for your platform, verify it, and place `boincrs` somewhere on your
+`PATH`:
+
+```bash
+# Example: Linux x86-64
+curl -LO https://github.com/jakenherman/boincrs/releases/latest/download/checksums.txt
+# download the matching boincrs-<version>-x86_64-unknown-linux-gnu.tar.gz, then:
+sha256sum -c checksums.txt --ignore-missing
+tar xzf boincrs-*-x86_64-unknown-linux-gnu.tar.gz
+install -m 0755 boincrs ~/.local/bin/boincrs
+```
+
+## Verify the install
+
+```bash
+boincrs --version
+```
+
+## Build from source
+
+Prerequisites:
 
 - [BOINC](https://boinc.berkeley.edu/download.php) client (with GUI RPC
   enabled) for the local daemon.
 - [Rust](https://rustup.rs/) stable toolchain with `cargo`.
 - `git` to clone the repository.
-
-## Build from source
 
 ```bash
 git clone https://github.com/jakenherman/boincrs.git

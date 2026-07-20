@@ -75,9 +75,32 @@ automatically:
 
 1. Merging the `chore: release` PR causes release-plz to push the `vX.Y.Z`
    tag and create the GitHub Release (notes sourced from `CHANGELOG.md`).
-2. The tag push triggers `.github/workflows/release.yml`, which builds the
-   Linux / macOS / Windows binaries and attaches them to the release.
+2. The tag push triggers `.github/workflows/release.yml`, which:
+   - builds the Linux / macOS / Windows binaries,
+   - attaches them plus a `checksums.txt` (SHA256) to the release,
+   - regenerates `Formula/boincrs.rb` and commits it to `main` (Homebrew tap),
+   - builds the Chocolatey `.nupkg`, attaches it, and — when the
+     `CHOCO_API_KEY` secret is set — pushes it to the community feed.
 
-Watch the `release` workflow run and confirm all three OS artifacts are
-attached. If an OS build fails, re-run that job; the release itself is
-already live and is not affected.
+Confirm each of these after the workflow finishes:
+
+- [ ] All four platform archives (linux, windows, mac arm64, mac x86_64) and
+      `checksums.txt` are attached to the release.
+- [ ] The `homebrew` job committed an updated `Formula/boincrs.rb` on `main`
+      with the new version and checksums.
+- [ ] `brew tap jakenherman/boincrs https://github.com/jakenherman/boincrs &&
+      brew install boincrs` installs the new version and `boincrs --version`
+      reports it.
+- [ ] The `chocolatey` job attached `boincrs.<version>.nupkg`. If publishing,
+      `choco install boincrs` (or the pending community-feed approval) reflects
+      the new version.
+
+If an OS build fails, re-run that job; the release itself is already live and is
+not affected. The `homebrew` and `chocolatey` jobs can also be re-run
+independently — both are idempotent (the formula commit is skipped when
+unchanged, and the `.nupkg` upload uses `--clobber`).
+
+> **First release only.** `Formula/boincrs.rb` does not exist until the first
+> tagged release creates it, and Chocolatey community-feed pushes require the
+> `CHOCO_API_KEY` secret. See [`packaging/README.md`](https://github.com/jakenherman/boincrs/tree/main/packaging)
+> for local dry-runs and the one-time secret setup.

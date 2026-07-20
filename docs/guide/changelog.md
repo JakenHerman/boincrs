@@ -27,8 +27,11 @@ Both are generated automatically by
    next version, a refreshed `Cargo.lock`, and the new `CHANGELOG.md` entry.
 3. Merging that PR tags the release and creates the GitHub Release (with
    notes sourced from `CHANGELOG.md`).
-4. The tag push triggers the `release` workflow, which builds the three OS
-   binaries and attaches them to the same release.
+4. The tag push triggers the `release` workflow, which builds the OS binaries,
+   attaches them plus a `checksums.txt` to the same release, updates the
+   Homebrew formula, and builds the Chocolatey package. See
+   [Installation](./installation.md) for the resulting `brew`/`choco` install
+   paths.
 
 See the [Release checklist](./release-checklist.md) for the pre-merge
 compatibility sign-off that runs against the `chore: release` PR.
