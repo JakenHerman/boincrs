@@ -67,22 +67,27 @@ async fn main() -> AppResult<()> {
 /// (Homebrew `test do`, Chocolatey validation) can query the binary without a
 /// running BOINC daemon.
 fn handle_cli_flags() {
-    for arg in std::env::args().skip(1) {
-        match arg.as_str() {
-            "-h" | "--help" => exit_with(0, HELP),
-            "-V" | "--version" => exit_with(0, &format!("boincrs {}\n", env!("CARGO_PKG_VERSION"))),
-            other => {
-                let msg = format!(
-                    "boincrs: unrecognized argument '{other}'\n\
-                     Try 'boincrs --help' for usage.\n"
-                );
-                let mut err = std::io::stderr();
-                let _ = err.write_all(msg.as_bytes());
-                let _ = err.flush();
-                std::process::exit(2);
-            }
-        }
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    if args.is_empty() {
+        return;
     }
+    // `--help` and `--version` take precedence over anything else on the line.
+    if args.iter().any(|a| a == "-h" || a == "--help") {
+        exit_with(0, HELP);
+    }
+    if args.iter().any(|a| a == "-V" || a == "--version") {
+        exit_with(0, &format!("boincrs {}\n", env!("CARGO_PKG_VERSION")));
+    }
+    // boincrs takes no positional arguments, so anything left is unrecognized.
+    let unknown = &args[0];
+    let msg = format!(
+        "boincrs: unrecognized argument '{unknown}'\n\
+         Try 'boincrs --help' for usage.\n"
+    );
+    let mut err = std::io::stderr();
+    let _ = err.write_all(msg.as_bytes());
+    let _ = err.flush();
+    std::process::exit(2);
 }
 
 /// Write `message` to stdout, flush it, and exit with `code`.
