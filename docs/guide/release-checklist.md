@@ -9,9 +9,10 @@ description: Pre-merge gate for the release-plz "chore release" PR — compatibi
 
 Releases are fully automated by
 [release-plz](https://release-plz.ieni.dev/) (see [Changelog](./changelog.md)
-for the shipping flow). This checklist is the gate a maintainer runs
-**before merging the `chore: release` PR** — merging that PR tags the version
-and fires off the prebuilt binary builds.
+for the shipping flow, and [Release process](./release-process.md) for the
+cadence, versioning, and RC-to-stable policy). This checklist is the gate a
+maintainer runs **before merging the `chore: release` PR** — merging that PR
+tags the version and fires off the prebuilt binary builds.
 
 ## Compatibility sign-off gate
 

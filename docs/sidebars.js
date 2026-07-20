@@ -30,6 +30,7 @@ const sidebars = {
       collapsed: true,
       items: ['decisions/0001-error-handling'],
     },
+    'release-process',
     'release-checklist',
     'roadmap',
     'changelog',
