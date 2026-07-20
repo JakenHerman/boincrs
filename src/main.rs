@@ -1,11 +1,34 @@
+use std::io::Write;
+
 use boincrs::app::controller::AppController;
 use boincrs::boinc::bootstrap::attach_projects_from_env;
 use boincrs::boinc::rpc_client::BoincRpcClient;
 use boincrs::boinc::transport::TcpBoincTransport;
 use boincrs::error::AppResult;
 
+const HELP: &str = "\
+boincrs \u{2014} a fast, keyboard-first terminal UI for a local BOINC client
+
+Usage:
+    boincrs [options]
+
+Options:
+    -h, --help       Print this help and exit
+    -V, --version    Print version information and exit
+
+boincrs is configured through the environment (and an optional .env file in the
+working directory). Common variables:
+
+    BOINCRS_ENDPOINT        BOINC GUI RPC address (default 127.0.0.1:31416)
+    BOINCRS_PASSWORD        GUI RPC password
+    BOINCRS_PASSWORD_FILE   path to a file containing the GUI RPC password
+
+Full guide: https://jakenherman.github.io/boincrs
+";
+
 #[tokio::main]
 async fn main() -> AppResult<()> {
+    handle_cli_flags();
     load_dotenv();
     let endpoint =
         std::env::var("BOINCRS_ENDPOINT").unwrap_or_else(|_| "127.0.0.1:31416".to_string());
@@ -34,6 +57,44 @@ async fn main() -> AppResult<()> {
         );
     }
     controller.run().await
+}
+
+/// Handle `--help` / `--version` before any network work.
+///
+/// Exits the process when such a flag (or an unrecognized argument) is present;
+/// returns normally when there is nothing to do and the TUI should launch.
+/// Keeping this ahead of any connection attempt means packaging smoke tests
+/// (Homebrew `test do`, Chocolatey validation) can query the binary without a
+/// running BOINC daemon.
+fn handle_cli_flags() {
+    for arg in std::env::args().skip(1) {
+        match arg.as_str() {
+            "-h" | "--help" => exit_with(0, HELP),
+            "-V" | "--version" => exit_with(0, &format!("boincrs {}\n", env!("CARGO_PKG_VERSION"))),
+            other => {
+                let msg = format!(
+                    "boincrs: unrecognized argument '{other}'\n\
+                     Try 'boincrs --help' for usage.\n"
+                );
+                let mut err = std::io::stderr();
+                let _ = err.write_all(msg.as_bytes());
+                let _ = err.flush();
+                std::process::exit(2);
+            }
+        }
+    }
+}
+
+/// Write `message` to stdout, flush it, and exit with `code`.
+///
+/// Uses an explicit flush so output is not lost when stdout is block-buffered
+/// (e.g. piped into another process), which `std::process::exit` would
+/// otherwise discard.
+fn exit_with(code: i32, message: &str) -> ! {
+    let mut out = std::io::stdout();
+    let _ = out.write_all(message.as_bytes());
+    let _ = out.flush();
+    std::process::exit(code);
 }
 
 fn load_dotenv() {
