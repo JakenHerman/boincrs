@@ -47,6 +47,22 @@ fn help_flag_prints_usage_and_exits_zero() {
     let stdout = String::from_utf8_lossy(&output.stdout);
     assert!(stdout.contains("Usage:"), "stdout was: {stdout:?}");
     assert!(stdout.contains("--version"), "stdout was: {stdout:?}");
+    // The env-var reference block is appended via clap's after_help.
+    assert!(
+        stdout.contains("BOINCRS_ENDPOINT"),
+        "stdout was: {stdout:?}"
+    );
+}
+
+#[test]
+fn help_lists_the_endpoint_flag() {
+    let output = boincrs()
+        .arg("--help")
+        .output()
+        .expect("run boincrs --help");
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("--endpoint"), "stdout was: {stdout:?}");
 }
 
 #[test]
@@ -58,9 +74,10 @@ fn unrecognized_argument_errors_with_exit_code_two() {
 
     assert!(!output.status.success());
     assert_eq!(output.status.code(), Some(2));
+    // clap reports unknown flags as an "unexpected argument" usage error.
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(
-        stderr.contains("unrecognized argument"),
+        stderr.contains("unexpected argument"),
         "stderr was: {stderr:?}",
     );
 }

@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1"
+clap = { version = "4", features = ["derive"] }
 crossterm = "0.29"
 md5 = "0.8"
 quick-xml = { version = "0.38", features = ["serialize"] }
