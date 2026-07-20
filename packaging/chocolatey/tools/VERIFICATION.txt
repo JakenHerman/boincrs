@@ -1,0 +1,26 @@
+VERIFICATION
+
+Verification is intended to assist the Chocolatey moderators and users in
+verifying that this package's contents are trustworthy.
+
+boincrs is authored by Jaken Herman and distributed as a prebuilt binary that
+is attached to the project's official GitHub Releases. This package does not
+bundle the binary; it downloads the release asset at install time and verifies
+it against the checksum embedded in the install script.
+
+Package version: {{VERSION}}
+Download URL:    https://github.com/jakenherman/boincrs/releases/download/v{{VERSION}}/boincrs-{{VERSION}}-x86_64-pc-windows-msvc.zip
+SHA256:          {{SHA256}}
+
+To verify the download matches the published release:
+
+  1. Download the zip from the URL above.
+  2. Run:  Get-FileHash .\boincrs-{{VERSION}}-x86_64-pc-windows-msvc.zip -Algorithm SHA256
+  3. Confirm the reported hash equals the SHA256 listed above. The same value
+     is published in the release's checksums.txt asset.
+
+The upstream source and the release workflow that produced this binary are
+public at https://github.com/jakenherman/boincrs.
+
+The bundled LICENSE.txt is a verbatim copy of the project's MIT license, also
+available at https://github.com/jakenherman/boincrs/blob/main/LICENSE.
